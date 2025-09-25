@@ -48,6 +48,7 @@ type
     LkCBLinha: TDBLookupComboBox;
     BitBtn4: TBitBtn;
     BitBtn5: TBitBtn;
+    CheckBox1: TCheckBox;
     procedure edtProd1Exit(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure edtProd2Exit(Sender: TObject);

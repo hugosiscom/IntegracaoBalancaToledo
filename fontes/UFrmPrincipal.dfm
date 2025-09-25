@@ -85,6 +85,14 @@ object Frmprincipal: TFrmprincipal
       TabOrder = 1
       OnClick = BtnToledoClick
     end
+    object CheckBox1: TCheckBox
+      Left = 878
+      Top = 22
+      Width = 97
+      Height = 17
+      Caption = 'Inf. Nutricional'
+      TabOrder = 2
+    end
   end
   object DBGrid1: TDBGrid
     Left = 4
@@ -153,8 +161,6 @@ object Frmprincipal: TFrmprincipal
     Height = 45
     Anchors = []
     TabOrder = 2
-    ExplicitLeft = 108
-    ExplicitTop = 605
     object btnOk: TBitBtn
       Left = 499
       Top = 3
