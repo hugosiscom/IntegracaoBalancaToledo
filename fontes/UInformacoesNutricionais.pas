@@ -64,7 +64,7 @@ begin
     UnidadePorcao := '0'
   else if SameText(AQuery.FieldByName('UNIDADE_PORCAO').AsString, 'ML') then
     UnidadePorcao := '1'
-  else
+  else if SameText(AQuery.FieldByName('UNIDADE_PORCAO').AsString, 'UN') then
     UnidadePorcao := '2';
 
   // Mapeamento da Parte Decimal
@@ -87,7 +87,7 @@ begin
   // --- PARTE 1: Bloco de dados conforme RDC 359/360 ---
   LinhaRDC360 := 'N' + FormatarCampoNumerico(AQuery.FieldByName('ID_PRODUTO_NUTRICIONAL').AsString, 6) + '0' +
   // Versão da Tabela (0 para RDC 359/360)
-    FormatarValorDecimal(AQuery.FieldByName('QUANTIDADE').AsFloat, 3, 1) + UnidadePorcao +
+    FormatarValorDecimal(AQuery.FieldByName('QUANTIDADE').AsFloat, 3, 0) + UnidadePorcao +
     FormatarCampoNumerico(AQuery.FieldByName('QTD_INTEIRA').AsString, 2) + ParteDecimal + MedidaCaseira +
     FormatarValorDecimal(AQuery.FieldByName('VALOR_CALORICO').AsFloat, 4, 0) +
     FormatarValorDecimal(AQuery.FieldByName('CARBOIDRATOS').AsFloat, 4, 1) +
@@ -154,7 +154,6 @@ begin
   ListaLinhas := TStringList.Create;
 
   try
-
     LDataSetProdutos.First;
     while not LDataSetProdutos.Eof do
     begin
