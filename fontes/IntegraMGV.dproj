@@ -2,7 +2,7 @@
     <PropertyGroup>
         <ProjectGuid>{74C390ED-2DEF-4DFB-9FFE-B6AF85FA0F67}</ProjectGuid>
         <MainSource>IntegraMGV.dpr</MainSource>
-        <Config Condition="'$(Config)'==''">Release</Config>
+        <Config Condition="'$(Config)'==''">Debug</Config>
         <DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
         <ProjectVersion>20.3</ProjectVersion>
         <FrameworkType>VCL</FrameworkType>
@@ -120,13 +120,11 @@
         </DCCReference>
         <DCCReference Include="C:\Trabalho Atual\Compartilhado\UDlg_cix.pas">
             <Form>frm_concilia_empresa</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="C:\Trabalho Atual\Compartilhado\encrypt_decrypt.pas"/>
         <DCCReference Include="C:\Trabalho Atual\Compartilhado\UUtilidade.pas"/>
         <DCCReference Include="UInformacoesNutricionais.pas">
             <Form>DataModule1</Form>
-            <FormType>dfm</FormType>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
         <BuildConfiguration Include="Base">

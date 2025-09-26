@@ -1,11 +1,6 @@
 program IntegraMGV;
 
 uses
-  madExcept,
-  madLinkDisAsm,
-  madListHardware,
-  madListProcesses,
-  madListModules,
   Forms,
   UFrmPrincipal in 'UFrmPrincipal.pas' {Frmprincipal},
   Udm in 'Udm.pas' {DM: TDataModule},

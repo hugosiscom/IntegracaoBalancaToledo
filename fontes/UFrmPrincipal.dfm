@@ -28,15 +28,15 @@ object Frmprincipal: TFrmprincipal
     Caption = 'Diret'#243'rio de Sa'#237'da Toledo'
     TabOrder = 1
     object edtDiretorio: TEdit
-      Left = 3
+      Left = 7
       Top = 18
-      Width = 712
+      Width = 602
       Height = 21
       TabOrder = 0
     end
     object BtnToledo: TBitBtn
-      Left = 721
-      Top = 16
+      Left = 621
+      Top = 14
       Width = 48
       Height = 25
       Glyph.Data = {
@@ -85,13 +85,27 @@ object Frmprincipal: TFrmprincipal
       TabOrder = 1
       OnClick = BtnToledoClick
     end
-    object CheckBox1: TCheckBox
+    object cbxInfoNutri: TCheckBox
       Left = 878
       Top = 22
       Width = 97
       Height = 17
       Caption = 'Inf. Nutricional'
       TabOrder = 2
+    end
+    object rdgNorma: TRadioGroup
+      Left = 675
+      Top = 3
+      Width = 197
+      Height = 36
+      Caption = 'Norma'
+      Columns = 2
+      DragMode = dmAutomatic
+      ItemIndex = 0
+      Items.Strings = (
+        '360'
+        '360 + 429')
+      TabOrder = 3
     end
   end
   object DBGrid1: TDBGrid
@@ -685,13 +699,13 @@ object Frmprincipal: TFrmprincipal
     object edtDiretorioF: TEdit
       Left = 3
       Top = 18
-      Width = 712
+      Width = 602
       Height = 21
       TabOrder = 0
     end
     object BitBtn9: TBitBtn
-      Left = 721
-      Top = 16
+      Left = 617
+      Top = 17
       Width = 48
       Height = 25
       Glyph.Data = {

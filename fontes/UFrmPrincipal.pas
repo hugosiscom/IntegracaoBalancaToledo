@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, EditNum, SqlExpr, Menus, ComCtrls, Buttons,
-  ExtCtrls, DBCtrls,  jpeg, DBGrids, Mask, IniFiles, FileCtrl, Grids, Data.DB;
+  ExtCtrls, DBCtrls, jpeg, DBGrids, Mask, IniFiles, FileCtrl, Grids, Data.DB;
 
 type
   TFrmprincipal = class(TForm)
@@ -48,17 +48,15 @@ type
     LkCBLinha: TDBLookupComboBox;
     BitBtn4: TBitBtn;
     BitBtn5: TBitBtn;
-    CheckBox1: TCheckBox;
-    procedure edtProd1Exit(Sender: TObject);
+    cbxInfoNutri: TCheckBox;
+    rdgNorma: TRadioGroup;
     procedure FormShow(Sender: TObject);
-    procedure edtProd2Exit(Sender: TObject);
     procedure edtProd2Enter(Sender: TObject);
     procedure edtProd1Enter(Sender: TObject);
     procedure edtGrupoEnter(Sender: TObject);
     procedure edtDivisaoEnter(Sender: TObject);
     procedure edtLinhaEnter(Sender: TObject);
-    procedure FormKeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure cboGrupoEnter(Sender: TObject);
     procedure cboDivisaoEnter(Sender: TObject);
@@ -103,14 +101,14 @@ var
 
 implementation
 
-uses Udm, UUtilidade;
+uses Udm, UUtilidade, UInformacoesNutricionais;
 
 {$R *.dfm}
 
 procedure TFrmprincipal.BtnToledoClick(Sender: TObject);
 begin
 
- SaveDialog1.FileName := 'TXITENS.TXT';
+  SaveDialog1.FileName := 'TXITENS.TXT';
   if SaveDialog1.Execute then
   begin
     edtDiretorio.Text := SaveDialog1.FileName;
@@ -122,21 +120,19 @@ end;
 
 procedure TFrmprincipal.btnSelecionaClick(Sender: TObject);
 var
-  x : Integer;
-  texto:String;
+  x: Integer;
 begin
-  //if (gridDivisoes.SelectedRows.Count = 0) and (gridGrupos.SelectedRows.Count =  0) and (gridLinhas.SelectedRows.Count = 0) then
-  if (LtVDivisao.Items.Count = 0) and (LtVGrupo.Items.Count =  0) and (LtVLinha.Items.Count = 0) and (not CbxFracionado.Checked ) then
+  // if (gridDivisoes.SelectedRows.Count = 0) and (gridGrupos.SelectedRows.Count =  0) and (gridLinhas.SelectedRows.Count = 0) then
+  if (LtVDivisao.Items.Count = 0) and (LtVGrupo.Items.Count = 0) and (LtVLinha.Items.Count = 0) and (not CbxFracionado.Checked)
+  then
   begin
-    if (MessageBox(0, '                   A T E N Ç Â O' + chr(13) +
-      '            Nenhum filtro foi informado.' + chr(13) +
-      'Confirma exportação de todos os Produtos ?',
-      'Integração SiscomSoft / MGV',
-      MB_ICONQUESTION or MB_YESNO or MB_DEFBUTTON1) = idNo) then
-      begin
-        LkCBGrupo.SetFocus;
-        exit;
-      end;
+    if (MessageBox(0, '                   A T E N Ç Â O' + chr(13) + '            Nenhum filtro foi informado.' + chr(13) +
+      'Confirma exportação de todos os Produtos ?', 'Integração SiscomSoft / MGV', MB_ICONQUESTION or MB_YESNO or MB_DEFBUTTON1)
+      = idNo) then
+    begin
+      LkCBGrupo.SetFocus;
+      exit;
+    end;
   end;
   Screen.Cursor := crHourglass;
 
@@ -145,80 +141,79 @@ begin
   dm.SqlProdutos.SQL.Clear;
   dm.SqlProdutos.SQL.Add(' select pro.* from produto pro ');
   dm.SqlProdutos.SQL.Add(' where (pro.INATIVO <>''S'' and pro.codproduto <> 0) ');
-  {Seleção dos Grupos}
+  { Seleção dos Grupos }
   if CbxFracionado.Checked then
-     begin
-        dm.SqlProdutos.SQL.Add(' and pro.FRACIONADO = ''S'' ');
-     end;
+  begin
+    dm.SqlProdutos.SQL.Add(' and pro.FRACIONADO = ''S'' ');
+  end;
 
   if LtVGrupo.Items.Count > 0 then
   begin
-    LtVGrupo.ItemIndex := 0 ;
-    for x := 0 to LtVGrupo.Items.Count -1 do
+    LtVGrupo.ItemIndex := 0;
+    for x := 0 to LtVGrupo.Items.Count - 1 do
     begin
       if x = 0 then
-        begin
-          dm.SqlProdutos.SQL.Add(' and (pro.CODGRUPO = ' +QuotedStr(LtVGrupo.Items[x].Caption) + '');
-        end
-        else
-        begin
-          dm.SqlProdutos.SQL.Add(' or pro.CODGRUPO = ' +  QuotedStr(LtVGrupo.Items[x].Caption) + '');
-        end;
+      begin
+        dm.SqlProdutos.SQL.Add(' and (pro.CODGRUPO = ' + QuotedStr(LtVGrupo.Items[x].Caption) + '');
+      end
+      else
+      begin
+        dm.SqlProdutos.SQL.Add(' or pro.CODGRUPO = ' + QuotedStr(LtVGrupo.Items[x].Caption) + '');
+      end;
     end;
   end;
   if LtVGrupo.Items.Count <> 0 then
-     dm.SqlProdutos.SQL.Add(')');
-  {Seleção das Divisões}
+    dm.SqlProdutos.SQL.Add(')');
+  { Seleção das Divisões }
   if LtVDivisao.Items.Count > 0 then
-     begin
-       LtVDivisao.ItemIndex := 0 ;
-       for x := 0 to LtVDivisao .Items.Count -1 do
-       begin
-         if x = 0 then
-            begin
-              dm.SqlProdutos.SQL.Add(' and (pro.CODDIVISAO = ' +QuotedStr(LtVDivisao.Items[x].Caption) + '');
-            end
-            else
-            begin
-              dm.SqlProdutos.SQL.Add(' or pro.CODDIVISAO = ' +QuotedStr(LtVDivisao.Items[x].Caption) + '');
-            end;
-       end;
-       if LtVDivisao.Items.Count <> 0 then
-          dm.SqlProdutos.SQL.Add(')');
-     end;
-  {Seleção das Linhas}
+  begin
+    LtVDivisao.ItemIndex := 0;
+    for x := 0 to LtVDivisao.Items.Count - 1 do
+    begin
+      if x = 0 then
+      begin
+        dm.SqlProdutos.SQL.Add(' and (pro.CODDIVISAO = ' + QuotedStr(LtVDivisao.Items[x].Caption) + '');
+      end
+      else
+      begin
+        dm.SqlProdutos.SQL.Add(' or pro.CODDIVISAO = ' + QuotedStr(LtVDivisao.Items[x].Caption) + '');
+      end;
+    end;
+    if LtVDivisao.Items.Count <> 0 then
+      dm.SqlProdutos.SQL.Add(')');
+  end;
+  { Seleção das Linhas }
   if LtVLinha.Items.Count > 0 then
-     begin
-       LtVLinha .ItemIndex := 0 ;
-       for x := 0 to LtVLinha.Items.Count -1 do
-         begin
-           if x = 0 then
-              begin
-                 dm.SqlProdutos.SQL.Add(' and (pro.CODLINHA = ' +QuotedStr(LtVLinha.Items[x].Caption) + '');
-              end
-              else
-              begin
-                dm.SqlProdutos.SQL.Add(' or pro.CODLINHA = ' +QuotedStr(LtVLinha.Items[x].Caption) + '');
-              end;
-         end;
-       if LtVLinha.Items.Count <> 0 then
-          dm.SqlProdutos.SQL.Add(')');
-     end;
-  //texto := dm.SQLPesqProd.SQL.Text;
+  begin
+    LtVLinha.ItemIndex := 0;
+    for x := 0 to LtVLinha.Items.Count - 1 do
+    begin
+      if x = 0 then
+      begin
+        dm.SqlProdutos.SQL.Add(' and (pro.CODLINHA = ' + QuotedStr(LtVLinha.Items[x].Caption) + '');
+      end
+      else
+      begin
+        dm.SqlProdutos.SQL.Add(' or pro.CODLINHA = ' + QuotedStr(LtVLinha.Items[x].Caption) + '');
+      end;
+    end;
+    if LtVLinha.Items.Count <> 0 then
+      dm.SqlProdutos.SQL.Add(')');
+  end;
+  // texto := dm.SQLPesqProd.SQL.Text;
   dm.SqlProdutos.Open;
   if dm.SqlProdutos.IsEmpty then
   begin
-    MessageBox(0, 'Produto não encontrado.', 'Integração SiscomSoft / Balança',
-      MB_ICONERROR or MB_OK);
+    MessageBox(0, 'Produto não encontrado.', 'Integração SiscomSoft / Balança', MB_ICONERROR or MB_OK);
     btnSair.SetFocus;
     Screen.Cursor := crDefault;
-    Exit;
+    exit;
   end;
 
   dm.CDSProdutos.Open;
   Frmprincipal.Refresh;
   Screen.Cursor := crDefault;
-  //btnOk.Enabled := true;
+  // btnOk.Enabled := true;
   if rgCodigo.ItemIndex = 1 then
   begin
     DBGrid1.Columns[0].Color := cl3DLight;
@@ -245,14 +240,14 @@ Var
   Item: TListItem;
 begin
   if LkCBDivisao.Text = '' then
-     begin
-       showmessage('Divisão não informada!');
-       LkCBDivisao.SetFocus;
-       exit;
-     end;
+  begin
+    ShowMessage('Divisão não informada!');
+    LkCBDivisao.SetFocus;
+    exit;
+  end;
   Item := LtVDivisao.Items.Add;
-  //Item.Caption :=dm.CDSDivisaoDESCREDDIVISAO.AsString;//LkCBlinha.Text;
-  Item.Caption :=dm.CDSDivisaoCODDIVISAO.AsString;//LkCBlinha.Text;
+  // Item.Caption :=dm.CDSDivisaoDESCREDDIVISAO.AsString;//LkCBlinha.Text;
+  Item.Caption := dm.CDSDivisaoCODDIVISAO.AsString; // LkCBlinha.Text;
   Item.SubItems.Add(dm.CDSDivisaoDESCDIVISAO.AsString);
 end;
 
@@ -261,21 +256,21 @@ Var
   Item: TListItem;
 begin
   if LkCBLinha.Text = '' then
-     begin
-       showmessage('Divisão não informada!');
-       LkCBLinha.SetFocus;
-       exit;
-     end;
+  begin
+    ShowMessage('Divisão não informada!');
+    LkCBLinha.SetFocus;
+    exit;
+  end;
   Item := LtVLinha.Items.Add;
-  //Item.Caption :=dm.CDSLinhaDESCREDLINHA.AsString;//LkCBlinha.Text;
-  Item.Caption :=dm.CDSLinhaCODLINHA.AsString;//LkCBlinha.Text;
+  // Item.Caption :=dm.CDSLinhaDESCREDLINHA.AsString;//LkCBlinha.Text;
+  Item.Caption := dm.CDSLinhaCODLINHA.AsString; // LkCBlinha.Text;
   Item.SubItems.Add(dm.CDSLinhaDESCLINHA.AsString);
 end;
 
 procedure TFrmprincipal.BitBtn5Click(Sender: TObject);
 begin
   if LtVLinha.ItemIndex >= 0 then
-    LtVLinha .DeleteSelected
+    LtVLinha.DeleteSelected
   else
     ShowMessage('Selecione um item para excluir');
 end;
@@ -285,14 +280,14 @@ Var
   Item: TListItem;
 begin
   if LkCBGrupo.Text = '' then
-     begin
-       showmessage('Divisão não informada!');
-       LkCBGrupo.SetFocus;
-       exit;
-     end;
+  begin
+    ShowMessage('Divisão não informada!');
+    LkCBGrupo.SetFocus;
+    exit;
+  end;
   Item := LtVGrupo.Items.Add;
-  //Item.Caption :=dm.CDSGrupoDESREDGRUPO.AsString;
-   Item.Caption :=dm.CDSGrupoCODGRUPO.AsString;
+  // Item.Caption :=dm.CDSGrupoDESREDGRUPO.AsString;
+  Item.Caption := dm.CDSGrupoCODGRUPO.AsString;
   Item.SubItems.Add(dm.CDSGrupoDESCGRUPO.AsString);
 end;
 
@@ -325,14 +320,18 @@ end;
 procedure TFrmprincipal.btnOkClick(Sender: TObject);
 begin
   if RbtToleo.Checked then
-     GerarTxtToledo
-     else
-     GerarTxtFilizola;
+  begin
+    GerarTxtToledo;
+    if cbxInfoNutri.Checked then
+      UInformacoesNutricionais.DataModule1.GerarArquivoNutricional(dm.DtsProdutos, edtDiretorio.Text);
+  end
+  else
+    GerarTxtFilizola;
 end;
 
 procedure TFrmprincipal.btnSairClick(Sender: TObject);
 begin
-  close;
+  Close;
 end;
 
 procedure TFrmprincipal.cboDivisaoEnter(Sender: TObject);
@@ -356,108 +355,108 @@ begin
 end;
 
 procedure TFrmprincipal.chkDivisoesClick(Sender: TObject);
-var
-  vlLinha: Integer;
+// var
+// vlLinha: Integer;
 begin
-{  with gridDivisoes.DataSource.DataSet do
-  begin
+  { with gridDivisoes.DataSource.DataSet do
+    begin
     First;
     for vlLinha := 0 to RecordCount - 1 do
     begin
-      if chkDivisoes.Checked = True then
-        gridDivisoes.SelectedRows.CurrentRowSelected := True
-      else
-        gridDivisoes.SelectedRows.CurrentRowSelected := False;
-      Next;
+    if chkDivisoes.Checked = True then
+    gridDivisoes.SelectedRows.CurrentRowSelected := True
+    else
+    gridDivisoes.SelectedRows.CurrentRowSelected := False;
+    Next;
     end;
-  end;
-  Label2.Visible := False;
-  gridDivisoes.SelectedRows.Refresh;}
+    end;
+    Label2.Visible := False;
+    gridDivisoes.SelectedRows.Refresh; }
 
 end;
 
 procedure TFrmprincipal.chkGruposClick(Sender: TObject);
-var
-  vlLinha: Integer;
+// var
+// vlLinha: Integer;
 begin
- { with gridGrupos.DataSource.DataSet do
-  begin
+  { with gridGrupos.DataSource.DataSet do
+    begin
     First;
     for vlLinha := 0 to RecordCount - 1 do
     begin
-      if chkGrupos.Checked = True then
-        gridGrupos.SelectedRows.CurrentRowSelected := True
-      else
-        gridGrupos.SelectedRows.CurrentRowSelected := False;
+    if chkGrupos.Checked = True then
+    gridGrupos.SelectedRows.CurrentRowSelected := True
+    else
+    gridGrupos.SelectedRows.CurrentRowSelected := False;
 
-      Next;
+    Next;
     end;
-  end;
-  Label1.Visible := False;
-  gridGrupos.SelectedRows.Refresh; }
+    end;
+    Label1.Visible := False;
+    gridGrupos.SelectedRows.Refresh; }
 end;
 
 procedure TFrmprincipal.chkLinhasClick(Sender: TObject);
-var
-  vlLinha: Integer;
+// var
+// vlLinha: Integer;
 begin
- { with gridLinhas.DataSource.DataSet do
-  begin
+  { with gridLinhas.DataSource.DataSet do
+    begin
     First;
     for vlLinha := 0 to RecordCount - 1 do
     begin
-      if chkLinhas.Checked = True then
-        gridLinhas.SelectedRows.CurrentRowSelected := True
-      else
-        gridLinhas.SelectedRows.CurrentRowSelected := False;
+    if chkLinhas.Checked = True then
+    gridLinhas.SelectedRows.CurrentRowSelected := True
+    else
+    gridLinhas.SelectedRows.CurrentRowSelected := False;
 
-      Next;
+    Next;
     end;
-  end;
-  Label3.Visible := False;
-  gridLinhas.SelectedRows.Refresh;   }
+    end;
+    Label3.Visible := False;
+    gridLinhas.SelectedRows.Refresh; }
 end;
 
 procedure TFrmprincipal.gridGruposCellClick(Column: TColumn);
 begin
-{  if gridGrupos.SelectedRows.Count > 0 then
-  begin
+  { if gridGrupos.SelectedRows.Count > 0 then
+    begin
     Label1.Visible := True;
     Label1.Caption := 'Selecionados : ' +
-      IntToStr(gridGrupos.SelectedRows.Count);
-  end
-  else
-  begin
+    IntToStr(gridGrupos.SelectedRows.Count);
+    end
+    else
+    begin
     Label1.Visible := False;
-  end;  }
+    end; }
 end;
 
 procedure TFrmprincipal.gridDivisoesCellClick(Column: TColumn);
 begin
- { if gridDivisoes.SelectedRows.Count > 0 then
-  begin
+  { if gridDivisoes.SelectedRows.Count > 0 then
+    begin
     Label2.Visible := True;
     Label2.Caption := 'Selecionados : ' +
-      IntToStr(gridDivisoes.SelectedRows.Count);
-  end
-  else
-  begin
+    IntToStr(gridDivisoes.SelectedRows.Count);
+    end
+    else
+    begin
     Label2.Visible := False;
-  end;}
+    end; }
 end;
 
 procedure TFrmprincipal.gridLinhasCellClick(Column: TColumn);
 begin
- { if gridLinhas.SelectedRows.Count > 0 then
-  begin
+  { if gridLinhas.SelectedRows.Count > 0 then
+    begin
     Label3.Visible := True;
     Label3.Caption := 'Selecionados : ' +
-      IntToStr(gridLinhas.SelectedRows.Count);
-  end
-  else
-  begin
+    IntToStr(gridLinhas.SelectedRows.Count);
+    end
+    else
+    begin
     Label3.Visible := False;
-  end; }
+    end; }
 
 end;
 
@@ -467,16 +466,16 @@ Var
   Ini: TIniFile;
 begin
   try
-    IniFile := ChangeFileExt(ExtractFilePath(ParamStr(0)) +  'IntegraMGV', '.ini');
+    IniFile := ChangeFileExt(ExtractFilePath(ParamStr(0)) + 'IntegraMGV', '.ini');
     Ini := TIniFile.create(IniFile);
     edtDiretorio.Text := Ini.ReadString('Configuracao', 'Diretorio', '');
     edtDiretorioF.Text := Ini.ReadString('Configuracao', 'DiretorioF', '');
     edtDpto.Text := Ini.ReadString('Configuracao', 'Departamento', '');
-    EdtCodEmpresa.Text :=IntToStr(Ini.ReadInteger('Configuracao', 'CodEmpresa', 1));
-    RbtToleo.Checked := Ini.ReadBool( 'Configuracao', 'ModBalToledo'   ,true) ;
-    rgCodigo.ItemIndex := Ini.ReadInteger( 'Configuracao', 'TipoCodigo'   ,0) ;
+    EdtCodEmpresa.Text := IntToStr(Ini.ReadInteger('Configuracao', 'CodEmpresa', 1));
+    RbtToleo.Checked := Ini.ReadBool('Configuracao', 'ModBalToledo', true);
+    rgCodigo.ItemIndex := Ini.ReadInteger('Configuracao', 'TipoCodigo', 0);
     if not RbtToleo.Checked then
-       RbtFilizola.Checked := true;
+      RbtFilizola.Checked := true;
 
   finally
     Ini.Free;
@@ -503,28 +502,16 @@ begin
   entracor(Sender);
 end;
 
-procedure TFrmprincipal.edtProd1Exit(Sender: TObject);
-var
-  MyQuery: TSQLQuery;
-begin
-end;
-
 procedure TFrmprincipal.edtProd2Enter(Sender: TObject);
 begin
   entracor(Sender);
-  //  edtProd2.Text := '';
-  //  lblProd2.Caption := '';
-end;
-
-procedure TFrmprincipal.edtProd2Exit(Sender: TObject);
-var
-  MyQuery: TSQLQuery;
-begin
+  // edtProd2.Text := '';
+  // lblProd2.Caption := '';
 end;
 
 procedure TFrmprincipal.entracor(Sender: TObject);
 begin
-  //Default (255,255,230) (255,234,213) = laranja
+  // Default (255,255,230) (255,234,213) = laranja
   if (Sender is TEdit) then
     (Sender as TEdit).Color := RGB(247, 214, 138)
   else if (Sender is TDBComboBox) then
@@ -550,10 +537,9 @@ begin
 
 end;
 
-procedure TFrmprincipal.FormClose(Sender: TObject;
-  var Action: TCloseAction);
+procedure TFrmprincipal.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
- GravarConfiguracao;
+  GravarConfiguracao;
   dm.CDSProdutos.Close;
   dm.CDSLinha.Close;
   dm.CDSGrupo.Close;
@@ -568,17 +554,16 @@ begin
   application.OnMessage := ProcessaMsg;
 end;
 
-procedure TFrmprincipal.FormKeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
+procedure TFrmprincipal.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-  if (key = VK_ESCAPE) then
-    close;
+  if (Key = VK_ESCAPE) then
+    Close;
 
 end;
 
 procedure TFrmprincipal.FormShow(Sender: TObject);
 begin
-  //  dm.CDSProdutos.Open;
+  // dm.CDSProdutos.Open;
   dm.CDSLinha.Open;
   dm.CDSGrupo.Open;
   dm.CDSDivisao.Open;
@@ -587,60 +572,58 @@ begin
   dm.CDSGrupo.CommandText := ' Select * from grupo order by grupo.desredgrupo ';
   dm.CDSGrupo.Open;
   dm.CDSDivisao.Close;
-  dm.CDSDivisao.CommandText :=
-    ' Select * from divisao ORDER BY DIVISAO.DESCREDDIVISAO';
+  dm.CDSDivisao.CommandText := ' Select * from divisao ORDER BY DIVISAO.DESCREDDIVISAO';
   dm.CDSDivisao.Open;
   dm.CDSLinha.Close;
   dm.CDSLinha.CommandText := ' Select * from linha ORDER BY LINHA.DESCREDLINHA';
   dm.CDSLinha.Open;
-//  edtDiretorio.Text := extractfiledir(application.ExeName) + '\TXITENS.TXT';
+  // edtDiretorio.Text := extractfiledir(application.ExeName) + '\TXITENS.TXT';
 
 end;
 
 procedure TFrmprincipal.GerarTxtFilizola;
 var
   Arquivo: TextFile;
-  Fname, OutString, dpto, Codigo,Pausado: string;
-  TipoVenda:String;//tipo de produto 0 = venda por peso, 1 = venda por unidade ou 2 = EAN-13
-  ValorVenda:Double;
-  CodEmpresa:Integer;
+  Fname, OutString, dpto, Codigo, Pausado: string;
+  TipoVenda: String; // tipo de produto 0 = venda por peso, 1 = venda por unidade ou 2 = EAN-13
+  ValorVenda: Double;
+  CodEmpresa: Integer;
 begin
   try
-  if dm.CDSProdutos.RecordCount <=0 then
-     begin
-       ShowMessage('Nenhum produto selecionado !');
-       exit;
-     end;
+    if dm.CDSProdutos.RecordCount <= 0 then
+    begin
+      ShowMessage('Nenhum produto selecionado !');
+      exit;
+    end;
   except
     ShowMessage('Nenhum produto selecionado !');
     exit;
   end;
   if edtDiretorioF.Text = '' then
   begin
-    MessageBox(0, 'Informe o Diretório de Saída.',
-      'Integração SiscomSoft / Balança', MB_ICONERROR or MB_OK);
+    MessageBox(0, 'Informe o Diretório de Saída.', 'Integração SiscomSoft / Balança', MB_ICONERROR or MB_OK);
     edtDiretorioF.SetFocus;
     exit;
   end;
-  {if StrToInt(edtDpto.Text) = 0 then
-  begin
+  { if StrToInt(edtDpto.Text) = 0 then
+    begin
     MessageBox(0, 'Informe o Departamento no .',
-      'Integração SiscomSoft / MGV', MB_ICONERROR or MB_OK);
+    'Integração SiscomSoft / MGV', MB_ICONERROR or MB_OK);
     edtDpto.SetFocus;
     exit;
-  end;}
+    end; }
 
   Fname := edtDiretorioF.Text;
   AssignFile(Arquivo, Fname);
   Rewrite(Arquivo);
   Screen.Cursor := crHourglass;
-  //escolhe o codigo a ser mandado para o MGV
+  // escolhe o codigo a ser mandado para o MGV
   Codigo := '';
   dm.CDSProdutos.First;
   try
-    CodEmpresa :=StrToInt(EdtCodEmpresa.Text);
+    CodEmpresa := StrToInt(EdtCodEmpresa.Text);
   except
-    CodEmpresa:=1;
+    CodEmpresa := 1;
   end;
   while not dm.CDSProdutos.Eof do
   begin
@@ -653,49 +636,47 @@ begin
       Codigo := IntToStr(dm.CDSProdutosCODPRODUTO.AsInteger);
     end;
     try
-      //Código pra balança não pode ser maior que 6 digitos
-      Codigo :=  StrZero(StrToInt(Codigo), 6);
+      // Código pra balança não pode ser maior que 6 digitos
+      Codigo := StrZero(StrToInt(Codigo), 6);
     except
-      Codigo:='';
+      Codigo := '';
       dm.CDSProdutos.Next;
     end;
-    if codigo <>'' then
-       begin
-        if dm.CDSProdutosUNDV.AsString ='KG' then
-           TipoVenda:= 'P'
-           else
-           TipoVenda:= 'U';
-        dpto := StrZero(StrToInt(edtDpto.Text), 2);
-        {if dm.CDSProdutosID_DEPARTAMENTO.AsInteger <=0 then
-           dpto := StrZero(StrToInt(edtDpto.Text), 2)
-           else
-           dpto := StrZero(StrToInt(dm.CDSProdutosID_DEPARTAMENTO.AsString), 2);}
+    if Codigo <> '' then
+    begin
+      if dm.CDSProdutosUNDV.AsString = 'KG' then
+        TipoVenda := 'P'
+      else
+        TipoVenda := 'U';
+      dpto := StrZero(StrToInt(edtDpto.Text), 2);
+      { if dm.CDSProdutosID_DEPARTAMENTO.AsInteger <=0 then
+        dpto := StrZero(StrToInt(edtDpto.Text), 2)
+        else
+        dpto := StrZero(StrToInt(dm.CDSProdutosID_DEPARTAMENTO.AsString), 2); }
 
-        ValorVenda := dm.RetornaPromocao(dm.CDSprodutosCODPRODUTO.AsInteger,CodEmpresa,Now,Pausado);
-        if (ValorVenda <=0) or (Pausado ='S') then
-           ValorVenda :=dm.CDSProdutosPRCVENDA.AsCurrency
-           else
-           ValorVenda:=ValorVenda;
+      ValorVenda := dm.RetornaPromocao(dm.CDSProdutosCODPRODUTO.AsInteger, CodEmpresa, Now, Pausado);
+      if (ValorVenda <= 0) or (Pausado = 'S') then
+        ValorVenda := dm.CDSProdutosPRCVENDA.AsCurrency
+      else
+        ValorVenda := ValorVenda;
 
-        OutString :=
-        StrZero(StrToInt(Codigo), 6) +                                           //codigo do item
-        TipoVenda+                                                               //tipo de produto P = venda por peso, U = venda por unidade ou 2 = EAN-13
-        EspacosDireita(copy(dm.CDSProdutosDESCPROD.AsString, 1, 22),22) +        //desc 1 produto
-        StrZero(StrToInt(SoNumero(FormatCurr('0.00', ValorVenda))), 7) +         //preco do item
-        StrZero(dm.CDSProdutosPRZVAL.AsInteger, 3);                              // validade
- //       copy(dpto, 1, 2) +                                                     // codigo do dpto
-//        '00' +                                                                 // etiqueta config no dpto
-                                                                                 //Código pra balança não pode ser maior que 6 digitos
+      OutString := StrZero(StrToInt(Codigo), 6) + // codigo do item
+        TipoVenda + // tipo de produto P = venda por peso, U = venda por unidade ou 2 = EAN-13
+        EspacosDireita(copy(dm.CDSProdutosDESCPROD.AsString, 1, 22), 22) + // desc 1 produto
+        StrZero(StrToInt(SoNumero(FormatCurr('0.00', ValorVenda))), 7) + // preco do item
+        StrZero(dm.CDSProdutosPRZVAL.AsInteger, 3); // validade
+      // copy(dpto, 1, 2) +                                                     // codigo do dpto
+      // '00' +                                                                 // etiqueta config no dpto
+      // Código pra balança não pode ser maior que 6 digitos
 
-        //'                         ';                                           //desc 2 produto
-        Writeln(Arquivo, OutString);
-        dm.CDSProdutos.Next;
-       end;
+      // '                         ';                                           //desc 2 produto
+      Writeln(Arquivo, OutString);
+      dm.CDSProdutos.Next;
+    end;
   end;
   CloseFile(Arquivo);
-  MessageBox(0, 'Processamento Terminado!', 'Integração SiscomSoft / Balança',
-    MB_ICONINFORMATION or MB_OK);
-  //btnOk.Enabled := False;
+  MessageBox(0, 'Processamento Terminado!', 'Integração SiscomSoft / Balança', MB_ICONINFORMATION or MB_OK);
+  // btnOk.Enabled := False;
   Screen.Cursor := crDefault;
   btnSair.SetFocus;
 end;
@@ -703,25 +684,24 @@ end;
 procedure TFrmprincipal.GerarTxtToledo;
 var
   Arquivo: TextFile;
-  Fname, OutString, dpto, Codigo,Pausado: string;
-  TipoVenda:String;//tipo de produto 0 = venda por peso, 1 = venda por unidade ou 2 = EAN-13
-  ValorVenda:Double;
-  CodEmpresa:Integer;
+  Fname, OutString, dpto, Codigo, Pausado: string;
+  TipoVenda: String; // tipo de produto 0 = venda por peso, 1 = venda por unidade ou 2 = EAN-13
+  ValorVenda: Double;
+  CodEmpresa: Integer;
 begin
   try
-  if dm.CDSProdutos.RecordCount <=0 then
-     begin
-       ShowMessage('Nenhum produto selecionado !');
-       exit;
-     end;
+    if dm.CDSProdutos.RecordCount <= 0 then
+    begin
+      ShowMessage('Nenhum produto selecionado !');
+      exit;
+    end;
   except
     ShowMessage('Nenhum produto selecionado !');
     exit;
   end;
   if edtDiretorio.Text = '' then
   begin
-    MessageBox(0, 'Informe o Diretório de Saída.',
-      'Integração SiscomSoft / MGV', MB_ICONERROR or MB_OK);
+    MessageBox(0, 'Informe o Diretório de Saída.', 'Integração SiscomSoft / MGV', MB_ICONERROR or MB_OK);
     edtDiretorio.SetFocus;
     exit;
   end;
@@ -736,13 +716,13 @@ begin
   AssignFile(Arquivo, Fname);
   Rewrite(Arquivo);
   Screen.Cursor := crHourglass;
-  //escolhe o codigo a ser mandado para o MGV
+  // escolhe o codigo a ser mandado para o MGV
   Codigo := '';
   dm.CDSProdutos.First;
   try
-    CodEmpresa :=StrToInt(EdtCodEmpresa.Text);
+    CodEmpresa := StrToInt(EdtCodEmpresa.Text);
   except
-    CodEmpresa:=1;
+    CodEmpresa := 1;
   end;
   while not dm.CDSProdutos.Eof do
   begin
@@ -755,66 +735,66 @@ begin
       Codigo := IntToStr(dm.CDSProdutosCODPRODUTO.AsInteger);
     end;
     try
-      //Código pra balança não pode ser maior que 6 digitos
-      Codigo :=  StrZero(StrToInt(Codigo), 6);
+      // Código pra balança não pode ser maior que 6 digitos
+      Codigo := StrZero(StrToInt(Codigo), 6);
     except
-      Codigo:='';
+      Codigo := '';
       dm.CDSProdutos.Next;
     end;
-    if codigo <>'' then
-       begin
-        if dm.CDSProdutosUNDV.AsString ='KG' then
-           TipoVenda:= '0'
-           else
-           TipoVenda:= '1';
-       dpto := StrZero(StrToInt(edtDpto.Text), 2);
-       { if dm.CDSProdutosID_DEPARTAMENTO.AsInteger <=0 then
-           dpto := StrZero(StrToInt(edtDpto.Text), 2)
-           else
-           dpto := StrZero(StrToInt(dm.CDSProdutosID_DEPARTAMENTO.AsString), 2);}
-        ValorVenda := dm.RetornaPromocao(dm.CDSprodutosCODPRODUTO.AsInteger,CodEmpresa,Now,Pausado);
-        if (ValorVenda <=0) or (Pausado ='S') then
-           ValorVenda :=dm.CDSProdutosPRCVENDA.AsCurrency
-           else
-           ValorVenda:=ValorVenda;
+    if Codigo <> '' then
+    begin
+      if dm.CDSProdutosUNDV.AsString = 'KG' then
+        TipoVenda := '0'
+      else
+        TipoVenda := '1';
+      dpto := StrZero(StrToInt(edtDpto.Text), 2);
+      { if dm.CDSProdutosID_DEPARTAMENTO.AsInteger <=0 then
+        dpto := StrZero(StrToInt(edtDpto.Text), 2)
+        else
+        dpto := StrZero(StrToInt(dm.CDSProdutosID_DEPARTAMENTO.AsString), 2); }
+      ValorVenda := dm.RetornaPromocao(dm.CDSProdutosCODPRODUTO.AsInteger, CodEmpresa, Now, Pausado);
+      if (ValorVenda <= 0) or (Pausado = 'S') then
+        ValorVenda := dm.CDSProdutosPRCVENDA.AsCurrency
+      else
+        ValorVenda := ValorVenda;
 
-        OutString := copy(dpto, 1, 2) + // codigo do dpto
+      OutString := copy(dpto, 1, 2) + // codigo do dpto
         '00' + // etiqueta config no dpto
-         TipoVenda+//'0' + //tipo de produto 0 = venda por peso, 1 = venda por unidade ou 2 = EAN-13
-        StrZero(StrToInt(Codigo), 6) + //codigo do item
-        //Código pra balança não pode ser maior que 6 digitos
-        StrZero(StrToInt(SoNumero(FormatCurr('0.00', ValorVenda))), 6) + //preco do item
+        TipoVenda + // '0' + //tipo de produto 0 = venda por peso, 1 = venda por unidade ou 2 = EAN-13
+        StrZero(StrToInt(Codigo), 6) + // codigo do item
+      // Código pra balança não pode ser maior que 6 digitos
+        StrZero(StrToInt(SoNumero(FormatCurr('0.00', ValorVenda))), 6) + // preco do item
         StrZero(dm.CDSProdutosPRZVAL.AsInteger, 3) + // validade
-        copy(dm.CDSProdutosDESCPROD.AsString, 1, 25) + //desc 1 produto
-        '                         '; //desc 2 produto
-        Writeln(Arquivo, OutString);
-        dm.CDSProdutos.Next;
-       end;
+        copy(dm.CDSProdutosDESCPROD.AsString, 1, 25) + // desc 1 produto
+        '                         '; // desc 2 produto
+      Writeln(Arquivo, OutString);
+      dm.CDSProdutos.Next;
+    end;
   end;
   CloseFile(Arquivo);
-  MessageBox(0, 'Processamento Terminado!', 'Integração SiscomSoft / MGV',
-    MB_ICONINFORMATION or MB_OK);
-  //btnOk.Enabled := False;
+  MessageBox(0, 'Processamento Terminado!', 'Integração SiscomSoft / MGV', MB_ICONINFORMATION or MB_OK);
+  // btnOk.Enabled := False;
   Screen.Cursor := crDefault;
   btnSair.SetFocus;
 
 end;
 
 procedure TFrmprincipal.GravarConfiguracao;
-Var IniFile : String ;
-    Ini     : TIniFile ;
+Var
+  IniFile: String;
+  Ini: TIniFile;
 begin
-  IniFile := ChangeFileExt( ExtractFilePath(ParamStr(0))+'IntegraMGV', '.ini') ;
-  Ini := TIniFile.Create( IniFile );
+  IniFile := ChangeFileExt(ExtractFilePath(ParamStr(0)) + 'IntegraMGV', '.ini');
+  Ini := TIniFile.create(IniFile);
   try
-    Ini.WriteString( 'Configuracao', 'Diretorio'   ,EdtDiretorio.Text) ;
-    Ini.WriteString( 'Configuracao', 'DiretorioF'   ,EdtDiretorioF.Text) ;
-    Ini.WriteString( 'Configuracao', 'Departamento', EdtDpto.Text) ;
-    Ini.WriteInteger( 'Configuracao', 'CodEmpresa'   ,StrToInt(EdtCodEmpresa.Text)) ;
-    Ini.WriteBool ( 'Configuracao', 'ModBalToledo'   ,RbtToleo.Checked) ;
-    Ini.WriteInteger( 'Configuracao', 'TipoCodigo'   ,rgCodigo.ItemIndex) ;
+    Ini.WriteString('Configuracao', 'Diretorio', edtDiretorio.Text);
+    Ini.WriteString('Configuracao', 'DiretorioF', edtDiretorioF.Text);
+    Ini.WriteString('Configuracao', 'Departamento', edtDpto.Text);
+    Ini.WriteInteger('Configuracao', 'CodEmpresa', StrToInt(EdtCodEmpresa.Text));
+    Ini.WriteBool('Configuracao', 'ModBalToledo', RbtToleo.Checked);
+    Ini.WriteInteger('Configuracao', 'TipoCodigo', rgCodigo.ItemIndex);
   finally
-    Ini.Free ;
+    Ini.Free;
   end;
 end;
 
@@ -844,38 +824,36 @@ begin
     (Sender as TEditNum).Color := RGB(225, 253, 255);
 end;
 
-procedure Tfrmprincipal.ProcessaMsg(var MSg: TMsg; var Handled: Boolean);
+procedure TFrmprincipal.ProcessaMsg(var MSg: TMsg; var Handled: Boolean);
 begin
-  if msg.message = wm_keydown then
-    if not (Screen.ActiveControl is Tcustommemo) and not (Screen.ActiveControl
-      is
-      TbuttonControl) then
+  if MSg.message = wm_keydown then
+    if not(Screen.ActiveControl is Tcustommemo) and not(Screen.ActiveControl is TbuttonControl) then
     begin
-      if not (screen.ActiveControl is Tcustomcontrol) then
+      if not(Screen.ActiveControl is Tcustomcontrol) then
       begin
-        if msg.wparam = Vk_down then
-          msg.wparam := Vk_tab;
-        if msg.wparam = vk_up then
+        if MSg.wparam = Vk_down then
+          MSg.wparam := Vk_tab;
+        if MSg.wparam = vk_up then
         begin
-          msg.wparam := vk_clear;
-          screen.ActiveForm.Perform(WM_nextDlgCtl, 1, 0);
+          MSg.wparam := vk_clear;
+          Screen.ActiveForm.Perform(WM_nextDlgCtl, 1, 0);
         end;
       end;
-      if msg.wparam = vk_return then
-        msg.wparam := Vk_tab;
+      if MSg.wparam = vk_return then
+        MSg.wparam := Vk_tab;
     end;
-  //  if (Msg.message = WM_KEYDOWN) or (Msg.message = VK_LBUTTON) or (Msg.message =
-  //    VK_RBUTTON) or (Msg.message = VK_MBUTTON) or (Msg.message = WM_MOUSEMOVE)
-  //      then
-  //    ULTIMA := Time;
+  // if (Msg.message = WM_KEYDOWN) or (Msg.message = VK_LBUTTON) or (Msg.message =
+  // VK_RBUTTON) or (Msg.message = VK_MBUTTON) or (Msg.message = WM_MOUSEMOVE)
+  // then
+  // ULTIMA := Time;
 end;
 
-function Tfrmprincipal.StrZero(cNumero: Integer; cDigitos: Integer): string;
+function TFrmprincipal.StrZero(cNumero: Integer; cDigitos: Integer): string;
 var
   I: Integer;
   Texto: string;
 begin
-  Texto := Trim(InttoStr(cNumero));
+  Texto := Trim(IntToStr(cNumero));
   cDigitos := cDigitos - Length(Texto);
   for I := 1 to cDigitos do
   begin
@@ -885,4 +863,3 @@ begin
 end;
 
 end.
-

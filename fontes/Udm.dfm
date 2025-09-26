@@ -32,9 +32,8 @@ object DM: TDM
       'MaxBlobSize=-1'
       'IsolationLevel=ReadCommitted'
       'TrimChar=False'
-      '='
       'DriverName=Firebird'
-      'Database=127.0.0.1/3051:C:\siscom\BD\COMERCIAL.FDB'
+      'Database=127.0.0.1/3051:C:\SISCOM\BD\COMERCIAL.FDB'
       'RoleName=RoleName'
       'User_Name=SYSDBA'
       'Password=hfwarp'
@@ -46,10 +45,7 @@ object DM: TDM
       'ErrorResourceFile='
       'LocaleCode=0000'
       'Interbase TransIsolation=ReadCommited'
-      'Trim Char=False'
-      '='
-      '='
-      '=')
+      'Trim Char=False')
     Left = 48
     Top = 32
   end
