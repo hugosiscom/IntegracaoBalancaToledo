@@ -93,20 +93,6 @@ object Frmprincipal: TFrmprincipal
       Caption = 'Inf. Nutricional'
       TabOrder = 2
     end
-    object rdgNorma: TRadioGroup
-      Left = 675
-      Top = 3
-      Width = 197
-      Height = 36
-      Caption = 'Norma'
-      Columns = 2
-      DragMode = dmAutomatic
-      ItemIndex = 0
-      Items.Strings = (
-        '360'
-        '360 + 429')
-      TabOrder = 3
-    end
   end
   object DBGrid1: TDBGrid
     Left = 4
@@ -753,6 +739,21 @@ object Frmprincipal: TFrmprincipal
         4227312D21252314424242424242424242420E141B1B42424242}
       TabOrder = 1
       OnClick = BitBtn9Click
+    end
+    object rdgNorma: TRadioGroup
+      Left = 671
+      Top = 5
+      Width = 296
+      Height = 36
+      Caption = 'Norma'
+      Columns = 3
+      DragMode = dmAutomatic
+      ItemIndex = 0
+      Items.Strings = (
+        '360'
+        '360 + 429'
+        '429')
+      TabOrder = 2
     end
   end
   object GroupBox3: TGroupBox

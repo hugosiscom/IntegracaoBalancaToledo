@@ -84,6 +84,9 @@ begin
 
   MedidaCaseira := AQuery.FieldByName('UNIDADE_CASEIRA').AsString;
 
+  var
+  rbSelecionado := Frmprincipal.rdgNorma.ItemIndex;
+
   // --- PARTE 1: Bloco de dados conforme RDC 359/360 ---
   LinhaRDC360 := 'N' + FormatarCampoNumerico(AQuery.FieldByName('ID_PRODUTO_NUTRICIONAL').AsString, 6) + '0' +
   // Versão da Tabela (0 para RDC 359/360)
@@ -99,7 +102,11 @@ begin
     FormatarValorDecimal(AQuery.FieldByName('SODIO').AsFloat, 5, 1) + '0000'; // Reservado (4 posições)
 
   // --- PARTE 2: Bloco de dados conforme RDC 429 ---
-  LinhaRDC429 := '|' +
+  if rbSelecionado = 1 then
+    LinhaRDC429 := '|';
+
+  LinhaRDC429 := LinhaRDC429 +
+
   // Campos que não existem na sua DDL (Açúcares), mantemos como zero.
     FormatarValorDecimal(0, 4, 1) + // Açúcares Totais
     FormatarValorDecimal(0, 4, 1) + // Açúcares Adicionados
@@ -122,13 +129,12 @@ begin
     FormatarValorDecimal(AQuery.FieldByName('CALCIO_VD').AsFloat, 3, 1) +
     FormatarValorDecimal(AQuery.FieldByName('FERRO_VD').AsFloat, 5, 1) + '000'; // Reservado (3 posições)
 
-  var
-  rbSelecionado := Frmprincipal.rdgNorma.ItemIndex;
-
   if rbSelecionado = 0 then
     Result := LinhaRDC360
   else if rbSelecionado = 1 then
     Result := LinhaRDC360 + LinhaRDC429
+  else if rbSelecionado = 2 then
+    Result := LinhaRDC429
   else
     Exception.Create('Opção inválida para o radioGroup');
 end;
