@@ -324,6 +324,385 @@ object DM: TDM
       FieldName = 'LOCAL_ENDERECO'
       Size = 22
     end
+    object CDSProdutosLOJA: TStringField
+      FieldName = 'LOJA'
+      FixedChar = True
+      Size = 2
+    end
+    object CDSProdutosTIPOITEM: TStringField
+      FieldName = 'TIPOITEM'
+      Size = 2
+    end
+    object CDSProdutosIND_PROD: TStringField
+      FieldName = 'IND_PROD'
+      FixedChar = True
+      Size = 1
+    end
+    object CDSProdutosALTERADA: TStringField
+      FieldName = 'ALTERADA'
+      Size = 32
+    end
+    object CDSProdutosCST_PIS: TStringField
+      FieldName = 'CST_PIS'
+      Size = 3
+    end
+    object CDSProdutosPESO_BRUTO: TFMTBCDField
+      FieldName = 'PESO_BRUTO'
+      Precision = 18
+      Size = 4
+    end
+    object CDSProdutosCST_ICMS_S: TStringField
+      FieldName = 'CST_ICMS_S'
+      Size = 2
+    end
+    object CDSProdutosCST_ICMS_E: TStringField
+      FieldName = 'CST_ICMS_E'
+      Size = 2
+    end
+    object CDSProdutosORIGEM: TStringField
+      FieldName = 'ORIGEM'
+      FixedChar = True
+      Size = 1
+    end
+    object CDSProdutosIND_ICMS_ECF: TStringField
+      FieldName = 'IND_ICMS_ECF'
+      Size = 2
+    end
+    object CDSProdutosQTD_CX: TFMTBCDField
+      FieldName = 'QTD_CX'
+      Precision = 18
+      Size = 4
+    end
+    object CDSProdutosCODBARRACX: TStringField
+      FieldName = 'CODBARRACX'
+      Size = 22
+    end
+    object CDSProdutosQTD_ATACADO: TFMTBCDField
+      FieldName = 'QTD_ATACADO'
+      Precision = 18
+      Size = 4
+    end
+    object CDSProdutosCST_PIS_ENT: TStringField
+      FieldName = 'CST_PIS_ENT'
+      Size = 3
+    end
+    object CDSProdutosALIQ_PIS_QUANT: TFMTBCDField
+      FieldName = 'ALIQ_PIS_QUANT'
+      Precision = 18
+      Size = 2
+    end
+    object CDSProdutosALIQ_COFINS_QUANT: TFMTBCDField
+      FieldName = 'ALIQ_COFINS_QUANT'
+      Precision = 18
+      Size = 2
+    end
+    object CDSProdutosALIQ_PIS: TFMTBCDField
+      FieldName = 'ALIQ_PIS'
+      Precision = 18
+      Size = 2
+    end
+    object CDSProdutosALIQ_COFINS: TFMTBCDField
+      FieldName = 'ALIQ_COFINS'
+      Precision = 18
+      Size = 2
+    end
+    object CDSProdutosDATA_HORA_ALTERACAO: TSQLTimeStampField
+      FieldName = 'DATA_HORA_ALTERACAO'
+    end
+    object CDSProdutosTIPO_SERVICO: TStringField
+      FieldName = 'TIPO_SERVICO'
+      Size = 5
+    end
+    object CDSProdutosCST_IPI_ENT: TStringField
+      FieldName = 'CST_IPI_ENT'
+      Size = 2
+    end
+    object CDSProdutosCST_IPI: TStringField
+      FieldName = 'CST_IPI'
+      Size = 2
+    end
+    object CDSProdutosCTRL_LOTE: TStringField
+      FieldName = 'CTRL_LOTE'
+      FixedChar = True
+      Size = 1
+    end
+    object CDSProdutosIAT: TStringField
+      FieldName = 'IAT'
+      FixedChar = True
+      Size = 1
+    end
+    object CDSProdutosMULTIPLICADOR: TIntegerField
+      FieldName = 'MULTIPLICADOR'
+    end
+    object CDSProdutosLETRA: TStringField
+      FieldName = 'LETRA'
+      Size = 3
+    end
+    object CDSProdutosCEST: TStringField
+      FieldName = 'CEST'
+      Size = 7
+    end
+    object CDSProdutosCOD_ANP: TStringField
+      FieldName = 'COD_ANP'
+      Size = 9
+    end
+    object CDSProdutosID_GRADE_TAMANHO: TIntegerField
+      FieldName = 'ID_GRADE_TAMANHO'
+    end
+    object CDSProdutosMOD_BC_ST: TIntegerField
+      FieldName = 'MOD_BC_ST'
+    end
+    object CDSProdutosVALOR_PAUTA: TFMTBCDField
+      FieldName = 'VALOR_PAUTA'
+      Precision = 18
+      Size = 2
+    end
+    object CDSProdutosPERC_BASE_CALC_ST: TFMTBCDField
+      FieldName = 'PERC_BASE_CALC_ST'
+      Precision = 18
+      Size = 2
+    end
+    object CDSProdutosIMPRESSORA: TIntegerField
+      FieldName = 'IMPRESSORA'
+    end
+    object CDSProdutosBAIXA_ESTOQUE: TStringField
+      FieldName = 'BAIXA_ESTOQUE'
+      FixedChar = True
+      Size = 1
+    end
+    object CDSProdutosULT_PRV_VENDA: TFMTBCDField
+      FieldName = 'ULT_PRV_VENDA'
+      Precision = 18
+      Size = 4
+    end
+    object CDSProdutosIND_PV_2: TFMTBCDField
+      FieldName = 'IND_PV_2'
+      Precision = 18
+      Size = 2
+    end
+    object CDSProdutosIND_PV_3: TFMTBCDField
+      FieldName = 'IND_PV_3'
+      Precision = 18
+      Size = 2
+    end
+    object CDSProdutosIND_PV_4: TFMTBCDField
+      FieldName = 'IND_PV_4'
+      Precision = 18
+      Size = 2
+    end
+    object CDSProdutosIND_PV_5: TFMTBCDField
+      FieldName = 'IND_PV_5'
+      Precision = 18
+      Size = 2
+    end
+    object CDSProdutosIND_PV_6: TFMTBCDField
+      FieldName = 'IND_PV_6'
+      Precision = 18
+      Size = 2
+    end
+    object CDSProdutosIND_PV_7: TFMTBCDField
+      FieldName = 'IND_PV_7'
+      Precision = 18
+      Size = 2
+    end
+    object CDSProdutosPRC_VENDA_2: TFMTBCDField
+      FieldName = 'PRC_VENDA_2'
+      Precision = 18
+      Size = 4
+    end
+    object CDSProdutosPRC_VENDA_3: TFMTBCDField
+      FieldName = 'PRC_VENDA_3'
+      Precision = 18
+      Size = 4
+    end
+    object CDSProdutosPRC_VENDA_4: TFMTBCDField
+      FieldName = 'PRC_VENDA_4'
+      Precision = 18
+      Size = 4
+    end
+    object CDSProdutosPRC_VENDA_5: TFMTBCDField
+      FieldName = 'PRC_VENDA_5'
+      Precision = 18
+      Size = 4
+    end
+    object CDSProdutosPRC_VENDA_6: TFMTBCDField
+      FieldName = 'PRC_VENDA_6'
+      Precision = 18
+      Size = 4
+    end
+    object CDSProdutosPRC_VENDA_7: TFMTBCDField
+      FieldName = 'PRC_VENDA_7'
+      Precision = 18
+      Size = 4
+    end
+    object CDSProdutosDESCANP: TStringField
+      FieldName = 'DESCANP'
+      Size = 95
+    end
+    object CDSProdutosPGLP: TFMTBCDField
+      FieldName = 'PGLP'
+      Precision = 18
+      Size = 2
+    end
+    object CDSProdutosPGNN: TFMTBCDField
+      FieldName = 'PGNN'
+      Precision = 18
+      Size = 2
+    end
+    object CDSProdutosPGNI: TFMTBCDField
+      FieldName = 'PGNI'
+      Precision = 18
+      Size = 2
+    end
+    object CDSProdutosVPART: TFMTBCDField
+      FieldName = 'VPART'
+      Precision = 18
+      Size = 2
+    end
+    object CDSProdutosCODIF: TIntegerField
+      FieldName = 'CODIF'
+    end
+    object CDSProdutosFRACIONADO: TStringField
+      FieldName = 'FRACIONADO'
+      FixedChar = True
+      Size = 1
+    end
+    object CDSProdutosID_PRINCIPIO_ATIVO: TIntegerField
+      FieldName = 'ID_PRINCIPIO_ATIVO'
+    end
+    object CDSProdutosPOSOLOGIA: TMemoField
+      FieldName = 'POSOLOGIA'
+      BlobType = ftMemo
+      Size = 1
+    end
+    object CDSProdutosRG_MS: TStringField
+      FieldName = 'RG_MS'
+    end
+    object CDSProdutosINSUMO: TStringField
+      FieldName = 'INSUMO'
+      FixedChar = True
+      Size = 1
+    end
+    object CDSProdutosSNGPC: TStringField
+      FieldName = 'SNGPC'
+      FixedChar = True
+      Size = 1
+    end
+    object CDSProdutosNOME_CIENTIFICO: TStringField
+      FieldName = 'NOME_CIENTIFICO'
+      Size = 50
+    end
+    object CDSProdutosTIPO_MEDICAMENTO: TIntegerField
+      FieldName = 'TIPO_MEDICAMENTO'
+    end
+    object CDSProdutosTIPO_RECEITA: TIntegerField
+      FieldName = 'TIPO_RECEITA'
+    end
+    object CDSProdutosPRC_FABRICA: TFMTBCDField
+      FieldName = 'PRC_FABRICA'
+      Precision = 18
+      Size = 4
+    end
+    object CDSProdutosCODIGO_BENEFICIO_FISCAL: TStringField
+      FieldName = 'CODIGO_BENEFICIO_FISCAL'
+      Size = 12
+    end
+    object CDSProdutosGUID_CONTROLE: TStringField
+      FieldName = 'GUID_CONTROLE'
+      Size = 1
+    end
+    object CDSProdutosIND_COMISSAO: TFMTBCDField
+      FieldName = 'IND_COMISSAO'
+      Precision = 18
+      Size = 2
+    end
+    object CDSProdutosACRESCIMO_MAX: TFMTBCDField
+      FieldName = 'ACRESCIMO_MAX'
+      Precision = 18
+      Size = 2
+    end
+    object CDSProdutosQTD_ATACADO2: TFMTBCDField
+      FieldName = 'QTD_ATACADO2'
+      Precision = 18
+      Size = 4
+    end
+    object CDSProdutosCODPRODUTO_PAI: TIntegerField
+      FieldName = 'CODPRODUTO_PAI'
+    end
+    object CDSProdutosNAO_MULTIPLICA_PDV: TStringField
+      FieldName = 'NAO_MULTIPLICA_PDV'
+      FixedChar = True
+      Size = 1
+    end
+    object CDSProdutosALTERA_VALOR: TStringField
+      FieldName = 'ALTERA_VALOR'
+      FixedChar = True
+      Size = 1
+    end
+    object CDSProdutosBALANCA_PDV: TStringField
+      FieldName = 'BALANCA_PDV'
+      FixedChar = True
+      Size = 1
+    end
+    object CDSProdutosNAO_PDV: TStringField
+      FieldName = 'NAO_PDV'
+      FixedChar = True
+      Size = 1
+    end
+    object CDSProdutosNAO_VENDA_ORC: TStringField
+      FieldName = 'NAO_VENDA_ORC'
+      FixedChar = True
+      Size = 1
+    end
+    object CDSProdutosNAO_MOBILE: TStringField
+      FieldName = 'NAO_MOBILE'
+      FixedChar = True
+      Size = 1
+    end
+    object CDSProdutosPONTO_PROD: TFMTBCDField
+      FieldName = 'PONTO_PROD'
+      Precision = 18
+      Size = 4
+    end
+    object CDSProdutosNAO_COBRA_TAXA: TStringField
+      FieldName = 'NAO_COBRA_TAXA'
+      FixedChar = True
+      Size = 1
+    end
+    object CDSProdutosID_PRODUTO_NUTRICIONA: TIntegerField
+      FieldName = 'ID_PRODUTO_NUTRICIONA'
+    end
+    object CDSProdutosCODIGO_ORIGINAL: TStringField
+      FieldName = 'CODIGO_ORIGINAL'
+      Size = 22
+    end
+    object CDSProdutosAPLICACAO: TMemoField
+      FieldName = 'APLICACAO'
+      BlobType = ftMemo
+      Size = 1
+    end
+    object CDSProdutosPESO_TARA: TFMTBCDField
+      FieldName = 'PESO_TARA'
+      Precision = 18
+      Size = 4
+    end
+    object CDSProdutosPRODUTO_KIT: TStringField
+      FieldName = 'PRODUTO_KIT'
+      FixedChar = True
+      Size = 1
+    end
+    object CDSProdutosCODMARCA: TIntegerField
+      FieldName = 'CODMARCA'
+    end
+    object CDSProdutosCONCENTRACAO: TStringField
+      FieldName = 'CONCENTRACAO'
+      Size = 50
+    end
+    object CDSProdutosMED_CONTROLADO: TStringField
+      FieldName = 'MED_CONTROLADO'
+      FixedChar = True
+      Size = 1
+    end
   end
   object SQLGrupo: TSQLDataSet
     SchemaName = 'SYSDBA'
@@ -517,8 +896,7 @@ object DM: TDM
     Params = <>
     SQL.Strings = (
       ' select pro.* from produto pro'
-      ' where (pro.INATIVO <>'#39'S'#39' and pro.codproduto <> 0) '
-      '             ')
+      ' where (pro.INATIVO <>'#39'S'#39' and pro.codproduto <> 0)')
     SQLConnection = SQLConnectSiscomsoft
     Left = 48
     Top = 104

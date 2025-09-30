@@ -99,7 +99,7 @@ begin
     FormatarValorDecimal(AQuery.FieldByName('GORDURAS_SATURADAS').AsFloat, 3, 1) +
     FormatarValorDecimal(AQuery.FieldByName('GORDURAS_TRANS').AsFloat, 3, 1) +
     FormatarValorDecimal(AQuery.FieldByName('FIBRA_ALIMENTAR').AsFloat, 3, 1) +
-    FormatarValorDecimal(AQuery.FieldByName('SODIO').AsFloat, 5, 1) + '0000'; // Reservado (4 posições)
+    FormatarValorDecimal(AQuery.FieldByName('SODIO').AsFloat, 5, 1);
 
   // --- PARTE 2: Bloco de dados conforme RDC 429 ---
   if rbSelecionado = 1 then
@@ -132,8 +132,10 @@ begin
   if rbSelecionado = 0 then
     Result := LinhaRDC360
   else if rbSelecionado = 1 then
-    Result := LinhaRDC360 + LinhaRDC429
+    // MGV7
+    Result := LinhaRDC360 + '0000' + LinhaRDC429
   else if rbSelecionado = 2 then
+    // MGV7
     Result := LinhaRDC429
   else
     Exception.Create('Opção inválida para o radioGroup');

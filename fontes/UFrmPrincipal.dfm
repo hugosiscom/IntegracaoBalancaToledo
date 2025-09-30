@@ -21,9 +21,9 @@ object Frmprincipal: TFrmprincipal
     653)
   TextHeight = 13
   object GroupBox5: TGroupBox
-    Left = 4
+    Left = 8
     Top = 513
-    Width = 978
+    Width = 974
     Height = 45
     Caption = 'Diret'#243'rio de Sa'#237'da Toledo'
     TabOrder = 1
@@ -92,12 +92,13 @@ object Frmprincipal: TFrmprincipal
       Height = 17
       Caption = 'Inf. Nutricional'
       TabOrder = 2
+      OnClick = cbxInfoNutriClick
     end
   end
   object DBGrid1: TDBGrid
-    Left = 4
+    Left = 8
     Top = 327
-    Width = 978
+    Width = 974
     Height = 170
     DataSource = DM.DtsProdutos
     ReadOnly = True
@@ -155,14 +156,14 @@ object Frmprincipal: TFrmprincipal
       end>
   end
   object PanelExecuta: TPanel
-    Left = 110
+    Left = 8
     Top = 606
-    Width = 769
+    Width = 974
     Height = 45
     Anchors = []
     TabOrder = 2
     object btnOk: TBitBtn
-      Left = 499
+      Left = 711
       Top = 3
       Width = 125
       Height = 36
@@ -223,7 +224,7 @@ object Frmprincipal: TFrmprincipal
       OnClick = btnOkClick
     end
     object btnSair: TBitBtn
-      Left = 635
+      Left = 842
       Top = 3
       Width = 125
       Height = 36
@@ -258,6 +259,19 @@ object Frmprincipal: TFrmprincipal
       TabOrder = 1
       OnClick = btnSairClick
     end
+    object rgNomeArquivo: TRadioGroup
+      Left = 3
+      Top = 3
+      Width = 359
+      Height = 38
+      Caption = 'Nome do Arquivo'
+      Columns = 2
+      ItemIndex = 0
+      Items.Strings = (
+        'TXITENS (MGV 5)'
+        'Itensmgv (MGV 6)')
+      TabOrder = 2
+    end
   end
   object PanelSeleciona: TPanel
     Left = 4
@@ -267,7 +281,7 @@ object Frmprincipal: TFrmprincipal
     TabOrder = 3
     object btnSeleciona: TBitBtn
       Left = 568
-      Top = 2
+      Top = 6
       Width = 148
       Height = 33
       Caption = '&Seleciona Produtos'
@@ -390,20 +404,22 @@ object Frmprincipal: TFrmprincipal
       object RbtToleo: TRadioButton
         Left = 8
         Top = 16
-        Width = 49
+        Width = 54
         Height = 17
         Caption = 'Toledo'
         Checked = True
         TabOrder = 0
         TabStop = True
+        OnClick = RbtToleoClick
       end
       object RbtFilizola: TRadioButton
-        Left = 80
+        Left = 75
         Top = 16
         Width = 49
         Height = 17
         Caption = 'Filizola'
         TabOrder = 1
+        OnClick = RbtToleoClick
       end
     end
     object BitBtn8: TBitBtn
@@ -678,7 +694,7 @@ object Frmprincipal: TFrmprincipal
   object GroupBox8: TGroupBox
     Left = 8
     Top = 558
-    Width = 978
+    Width = 974
     Height = 45
     Caption = 'Diret'#243'rio de Sa'#237'da Filizola'
     TabOrder = 6
@@ -745,7 +761,7 @@ object Frmprincipal: TFrmprincipal
       Top = 5
       Width = 296
       Height = 36
-      Caption = 'Norma'
+      Caption = 'Norma Informa'#231#227'o Nutricional'
       Columns = 3
       DragMode = dmAutomatic
       ItemIndex = 0
@@ -754,6 +770,7 @@ object Frmprincipal: TFrmprincipal
         '360 + 429'
         '429')
       TabOrder = 2
+      Visible = False
     end
   end
   object GroupBox3: TGroupBox
@@ -865,7 +882,7 @@ object Frmprincipal: TFrmprincipal
   end
   object SaveDialog1: TSaveDialog
     FileName = 'cadastro.txt'
-    Left = 152
-    Top = 559
+    Left = 192
+    Top = 423
   end
 end

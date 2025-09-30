@@ -5,7 +5,8 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, EditNum, SqlExpr, Menus, ComCtrls, Buttons,
-  ExtCtrls, DBCtrls, jpeg, DBGrids, Mask, IniFiles, FileCtrl, Grids, Data.DB;
+  ExtCtrls, DBCtrls, jpeg, DBGrids, Mask, IniFiles, FileCtrl, Grids, Data.DB,
+  StrUtils;
 
 type
   TFrmprincipal = class(TForm)
@@ -50,6 +51,7 @@ type
     BitBtn5: TBitBtn;
     cbxInfoNutri: TCheckBox;
     rdgNorma: TRadioGroup;
+    rgNomeArquivo: TRadioGroup;
     procedure FormShow(Sender: TObject);
     procedure edtProd2Enter(Sender: TObject);
     procedure edtProd1Enter(Sender: TObject);
@@ -81,10 +83,14 @@ type
     procedure btnOkClick(Sender: TObject);
     procedure BitBtn8Click(Sender: TObject);
     procedure BitBtn9Click(Sender: TObject);
+    function PadDireita(const S: string; const Tamanho: Integer): string;
+    procedure cbxInfoNutriClick(Sender: TObject);
+    procedure RbtToleoClick(Sender: TObject);
   private
     { Private declarations }
     procedure ProcessaMsg(var MSg: TMsg; var Handled: Boolean);
     function StrZero(cNumero: Integer; cDigitos: Integer): string;
+
   public
     { Public declarations }
     procedure entracor(Sender: TObject);
@@ -93,6 +99,7 @@ type
     procedure GravarConfiguracao;
     procedure GerarTxtToledo;
     procedure GerarTxtFilizola;
+    procedure GerarItensmgv;
 
   end;
 
@@ -107,8 +114,11 @@ uses Udm, UUtilidade, UInformacoesNutricionais;
 
 procedure TFrmprincipal.BtnToledoClick(Sender: TObject);
 begin
+  if rgNomeArquivo.ItemIndex = 0 then
+    SaveDialog1.FileName := 'TXITENS.TXT'
+  else if rgNomeArquivo.ItemIndex = 1 then
+    SaveDialog1.FileName := 'Itensmgv.txt';
 
-  SaveDialog1.FileName := 'TXITENS.TXT';
   if SaveDialog1.Execute then
   begin
     edtDiretorio.Text := SaveDialog1.FileName;
@@ -321,12 +331,18 @@ procedure TFrmprincipal.btnOkClick(Sender: TObject);
 begin
   if RbtToleo.Checked then
   begin
-    GerarTxtToledo;
+    if rgNomeArquivo.ItemIndex = 0 then
+      GerarTxtToledo
+    else if rgNomeArquivo.ItemIndex = 1 then
+      GerarItensmgv;
+
     if cbxInfoNutri.Checked then
       UInformacoesNutricionais.DataModule1.GerarArquivoNutricional(dm.DtsProdutos, edtDiretorio.Text);
   end
   else
     GerarTxtFilizola;
+
+  MessageBox(0, 'Processamento Terminado!', 'Integração SiscomSoft / MGV', MB_ICONINFORMATION or MB_OK);
 end;
 
 procedure TFrmprincipal.btnSairClick(Sender: TObject);
@@ -352,6 +368,14 @@ end;
 procedure TFrmprincipal.cboLinhaEnter(Sender: TObject);
 begin
   entracor(Sender);
+end;
+
+procedure TFrmprincipal.cbxInfoNutriClick(Sender: TObject);
+begin
+  if cbxInfoNutri.Checked then
+    rdgNorma.Visible := true
+  else
+    rdgNorma.Visible := false;
 end;
 
 procedure TFrmprincipal.chkDivisoesClick(Sender: TObject);
@@ -675,17 +699,15 @@ begin
     end;
   end;
   CloseFile(Arquivo);
-  MessageBox(0, 'Processamento Terminado!', 'Integração SiscomSoft / Balança', MB_ICONINFORMATION or MB_OK);
   // btnOk.Enabled := False;
   Screen.Cursor := crDefault;
   btnSair.SetFocus;
 end;
 
-procedure TFrmprincipal.GerarTxtToledo;
+procedure TFrmprincipal.GerarItensmgv;
 var
   Arquivo: TextFile;
-  Fname, OutString, dpto, Codigo, Pausado: string;
-  TipoVenda: String; // tipo de produto 0 = venda por peso, 1 = venda por unidade ou 2 = EAN-13
+  Fname, OutString, dpto, Codigo, Pausado, TipoVenda: string;
   ValorVenda: Double;
   CodEmpresa: Integer;
 begin
@@ -699,13 +721,15 @@ begin
     ShowMessage('Nenhum produto selecionado !');
     exit;
   end;
+
   if edtDiretorio.Text = '' then
   begin
     MessageBox(0, 'Informe o Diretório de Saída.', 'Integração SiscomSoft / MGV', MB_ICONERROR or MB_OK);
     edtDiretorio.SetFocus;
     exit;
   end;
-  if StrToInt(edtDpto.Text) = 0 then
+
+  if (Trim(edtDpto.Text) = '') or (StrToIntDef(edtDpto.Text, 0) = 0) then
   begin
     MessageBox(0, 'Informe o Departamento no MGV.', 'Integração SiscomSoft / MGV', MB_ICONERROR or MB_OK);
     edtDpto.SetFocus;
@@ -716,67 +740,141 @@ begin
   AssignFile(Arquivo, Fname);
   Rewrite(Arquivo);
   Screen.Cursor := crHourglass;
-  // escolhe o codigo a ser mandado para o MGV
-  Codigo := '';
+
   dm.CDSProdutos.First;
   try
     CodEmpresa := StrToInt(EdtCodEmpresa.Text);
   except
     CodEmpresa := 1;
   end;
+
+  dpto := StrZero(StrToInt(edtDpto.Text), 2);
+
   while not dm.CDSProdutos.Eof do
   begin
     if rgCodigo.ItemIndex = 1 then
-    begin
-      Codigo := dm.CDSProdutosCODBARRA.AsString;
-    end
+      Codigo := dm.CDSProdutosCODBARRA.AsString
     else
-    begin
       Codigo := IntToStr(dm.CDSProdutosCODPRODUTO.AsInteger);
-    end;
+
     try
-      // Código pra balança não pode ser maior que 6 digitos
+      if Length(Codigo) > 6 then
+        Codigo := copy(Codigo, Length(Codigo) - 5, 6);
       Codigo := StrZero(StrToInt(Codigo), 6);
     except
       Codigo := '';
-      dm.CDSProdutos.Next;
     end;
+
     if Codigo <> '' then
     begin
+      // --- Definição dos campos antes de montar a string ---
+
+      // Tipo de Produto (0, 1, ou 2)
       if dm.CDSProdutosUNDV.AsString = 'KG' then
         TipoVenda := '0'
       else
         TipoVenda := '1';
-      dpto := StrZero(StrToInt(edtDpto.Text), 2);
-      { if dm.CDSProdutosID_DEPARTAMENTO.AsInteger <=0 then
-        dpto := StrZero(StrToInt(edtDpto.Text), 2)
-        else
-        dpto := StrZero(StrToInt(dm.CDSProdutosID_DEPARTAMENTO.AsString), 2); }
+
+      // Preço de Venda
       ValorVenda := dm.RetornaPromocao(dm.CDSProdutosCODPRODUTO.AsInteger, CodEmpresa, Now, Pausado);
       if (ValorVenda <= 0) or (Pausado = 'S') then
-        ValorVenda := dm.CDSProdutosPRCVENDA.AsCurrency
-      else
-        ValorVenda := ValorVenda;
+        ValorVenda := dm.CDSProdutosPRCVENDA.AsCurrency;
 
-      OutString := copy(dpto, 1, 2) + // codigo do dpto
-        '00' + // etiqueta config no dpto
-        TipoVenda + // '0' + //tipo de produto 0 = venda por peso, 1 = venda por unidade ou 2 = EAN-13
-        StrZero(StrToInt(Codigo), 6) + // codigo do item
-      // Código pra balança não pode ser maior que 6 digitos
-        StrZero(StrToInt(SoNumero(FormatCurr('0.00', ValorVenda))), 6) + // preco do item
-        StrZero(dm.CDSProdutosPRZVAL.AsInteger, 3) + // validade
-        copy(dm.CDSProdutosDESCPROD.AsString, 1, 25) + // desc 1 produto
-        '                         '; // desc 2 produto
+      // --- Montagem da String Final (forma direta e segura) ---
+      OutString :=
+      // Posição 01-02: Código do Departamento
+        dpto +
+      // Posição 03-03: Tipo de Produto
+        TipoVenda +
+      // Posição 04-09: Código do Item
+        Codigo +
+      // Posição 10-15: Preço do Item
+        StrZero(StrToInt(SoNumero(FormatCurr('0.00', ValorVenda))), 6) +
+      // Posição 16-18: Dias de Validade
+        StrZero(dm.CDSProdutosPRZVAL.AsInteger, 3) +
+      // Posição 19-43: Descrição do Produto (Alinhado à Esquerda)
+        PadDireita(Trim(dm.CDSProdutosDESCPROD.AsString), 25) +
+      // Posição 44-44: Descrição Segunda linha
+        PadDireita('', 25) +
+      // Código da Informação Extra do item
+        '000000' +
+      // Código da Imagem do Item
+        '0000' +
+      // Código da informação Nutricional
+        dm.CDSProdutosID_PRODUTO_NUTRICIONA.AsString.PadLeft(6, '0') +
+      // Impressão de Data de Validade 1 -- sim -- 0 não
+        '1' +
+      // Impressão da Data de Embalagem 1 -- sim -- 0 não
+        '1' +
+      // Cód. Fornecedor
+        dm.CDSProdutosCODFORNECEDOR.AsString.PadLeft(4, '0') +
+      // Lote
+        ''.PadLeft(12, '0') +
+      // Código EAN-13 Especial
+        ''.PadLeft(11, '0') +
+      // PadDireita('', 11) +
+      // Versão do preço
+        ''.PadLeft(1, '0') +
+      // PadDireita('', 1) +
+      // Código do Som
+        ''.PadLeft(4, '0') +
+      // Código de Tara Pré-determinada
+        ''.PadLeft(4, '0') +
+      // Código do Fracionador
+        ''.PadLeft(4, '0') +
+      // Código do Campo Extra 1
+        ''.PadLeft(4, '0') +
+      // Código do Campo Extra 2
+        ''.PadLeft(4, '0') +
+      // Código da Conservação
+        ''.PadLeft(4, '0') +
+      // EAN - 13 de Fornecedor
+        ''.PadLeft(12, '0') +
+      // Percentual de Glaciamento
+        ''.PadLeft(6, '0') + '|' +
+      // Sequencia de departamentos associados
+        ''.PadLeft(2, '0') + '|' +
+      // Descritivo do Item – Terceira Linha
+        ''.PadLeft(35, ' ') +
+      // Descritivo do Item – Quarta Linha
+        ''.PadLeft(35, ' ') +
+      // PadDireita('', 35) +
+      // Código do Campo Extra 3
+        ''.PadLeft(6, '0') +
+      // Código do Campo Extra 4
+        ''.PadLeft(6, '0') +
+      // Código da mídia (Prix 6 Touch)
+        ''.PadLeft(6, '0') +
+      // Preço Promocional - Preço/kg ou Preço/Unid. do item
+        ''.PadLeft(6, '0') +
+      // [0] = Utiliza o fornecedor associado  [1] = Balança solicita fornecedor após chamada do PLU
+        '0' +
+      // Código de Fornecedor Associado, de no máximo 4 bytes, utilizado no cadastro de fornecedores do MGV Obs:
+      // O código do fornecedor (de 6 bytes) utilizado no padrão RECFOR não pode ser utilizado para esta associação.
+      // Ex: Para associar fornecedores 2 e 5: |00020005|
+        '|' + ''.PadLeft(4, '0') + '|' +
+      // [0] = Não solicita tara na balança  [1] = Solicita Tara na Balança
+        '0' +
+      // Sequência de balanças onde o item não estará ativo.
+      // Ex: Para associar balanças 2 e 5 com itens inativos: |0205|
+        '|' + ''.PadLeft(2, '0') + '|' +
+      // Código EAN-13 Especial
+        ''.PadLeft(12, '0') +
+      // Percentual de Glaciamento
+      // Informação que será utilizada apenas para integração com o MGV Cloud.
+      // EX: 12, 33 = " 1233 "
+
+        ''.PadLeft(4, '0');
+
       Writeln(Arquivo, OutString);
       dm.CDSProdutos.Next;
     end;
   end;
+
   CloseFile(Arquivo);
-  MessageBox(0, 'Processamento Terminado!', 'Integração SiscomSoft / MGV', MB_ICONINFORMATION or MB_OK);
-  // btnOk.Enabled := False;
+
   Screen.Cursor := crDefault;
   btnSair.SetFocus;
-
 end;
 
 procedure TFrmprincipal.GravarConfiguracao;
@@ -848,6 +946,14 @@ begin
   // ULTIMA := Time;
 end;
 
+procedure TFrmprincipal.RbtToleoClick(Sender: TObject);
+begin
+  if RbtToleo.Checked then
+    rgNomeArquivo.Visible := true
+  else
+    rgNomeArquivo.Visible := false;
+end;
+
 function TFrmprincipal.StrZero(cNumero: Integer; cDigitos: Integer): string;
 var
   I: Integer;
@@ -860,6 +966,122 @@ begin
     Texto := '0' + Texto;
   end;
   Result := Texto;
+end;
+
+function TFrmprincipal.PadDireita(const S: string; const Tamanho: Integer): string;
+var
+  Len: Integer;
+begin
+  Len := Length(S);
+  if Len >= Tamanho then
+    Result := copy(S, 1, Tamanho) // Trunca a string se for maior
+  else
+    Result := S + StringOfChar(' ', Tamanho - Len); // Adiciona espaços à direita
+end;
+
+procedure TFrmprincipal.GerarTxtToledo;
+var
+  Arquivo: TextFile;
+  Fname, OutString, dpto, Codigo, Pausado: string;
+  TipoVenda: String; // tipo de produto 0 = venda por peso, 1 = venda por unidade ou 2 = EAN-13
+  ValorVenda: Double;
+  CodEmpresa: Integer;
+begin
+  try
+    if dm.CDSProdutos.RecordCount <= 0 then
+    begin
+      ShowMessage('Nenhum produto selecionado !');
+      exit;
+    end;
+  except
+    ShowMessage('Nenhum produto selecionado !');
+    exit;
+  end;
+
+  if edtDiretorio.Text = '' then
+  begin
+    MessageBox(0, 'Informe o Diretório de Saída.', 'Integraçãoo SiscomSoft / MGV', MB_ICONERROR or MB_OK);
+    edtDiretorio.SetFocus;
+    exit;
+  end;
+  if StrToInt(edtDpto.Text) = 0 then
+
+  begin
+    MessageBox(0, 'Informe o Departamento no MGV.', 'Integração SiscomSoft / MGV', MB_ICONERROR or MB_OK);
+    edtDpto.SetFocus;
+    exit;
+  end;
+
+  Fname := edtDiretorio.Text;
+  AssignFile(Arquivo, Fname);
+  Rewrite(Arquivo);
+  Screen.Cursor := crHourglass;
+  // escolhe o codigo a ser mandado para o MGV
+  Codigo := '';
+  dm.CDSProdutos.First;
+  try
+    CodEmpresa := StrToInt(EdtCodEmpresa.Text);
+  except
+    CodEmpresa := 1;
+  end;
+
+  while not dm.CDSProdutos.Eof do
+  begin
+    if rgCodigo.ItemIndex = 1 then
+    begin
+      Codigo := dm.CDSProdutosCODBARRA.AsString;
+    end
+    else
+    begin
+      Codigo := IntToStr(dm.CDSProdutosCODPRODUTO.AsInteger);
+    end;
+    try
+      // Código pra balança não pode ser maior que 6 digitos
+
+      Codigo := StrZero(StrToInt(Codigo), 6);
+    except
+      Codigo := '';
+      dm.CDSProdutos.Next;
+    end;
+
+    if Codigo <> '' then
+    begin
+
+      if dm.CDSProdutosUNDV.AsString = 'KG' then
+        TipoVenda := '0'
+      else
+        TipoVenda := '1';
+      dpto := StrZero(StrToInt(edtDpto.Text), 2);
+      { if dm.CDSProdutosID_DEPARTAMENTO.AsInteger <=0 then
+        dpto := StrZero(StrToInt(edtDpto.Text), 2)
+        else
+        dpto := StrZero(StrToInt(dm.CDSProdutosID_DEPARTAMENTO.AsString), 2); }
+      ValorVenda := dm.RetornaPromocao(dm.CDSProdutosCODPRODUTO.AsInteger, CodEmpresa, Now, Pausado);
+      if (ValorVenda <= 0) or (Pausado = 'S') then
+        ValorVenda := dm.CDSProdutosPRCVENDA.AsCurrency
+      else
+        ValorVenda := ValorVenda;
+
+      OutString := copy(dpto, 1, 2) + // codigo do dpto
+        '00' + // etiqueta config no dpto
+        TipoVenda + // '0' + //tipo de produto 0 = venda por peso, 1 = venda por unidade ou 2 = EAN-13
+        StrZero(StrToInt(Codigo), 6) + // codigo do item
+      // Código pra balança não pode ser maior que 6 digitos
+        StrZero(StrToInt(SoNumero(FormatCurr('0.00', ValorVenda))), 6) + // preco do item
+        StrZero(dm.CDSProdutosPRZVAL.AsInteger, 3) + // validade
+        copy(dm.CDSProdutosDESCPROD.AsString, 1, 25) + // desc 1 produto
+        '                         '; // desc 2 produto
+      Writeln(Arquivo, OutString);
+      dm.CDSProdutos.Next;
+    end;
+
+  end;
+
+  CloseFile(Arquivo);
+  // btnOk.Enabled := False;
+  Screen.Cursor := crDefault;
+  btnSair.SetFocus;
+
 end;
 
 end.
