@@ -5,17 +5,18 @@ object DataModule1: TDataModule1
     MaxBlobSize = -1
     Params = <
       item
-        DataType = ftUnknown
+        DataType = ftInteger
         Name = 'CODPRODUTO'
         ParamType = ptInput
       end>
     SQL.Strings = (
       'SELECT PN.*, P.CODPRODUTO FROM PRODUTO P '
       'INNER JOIN PRODUTO_NUTRICIONAL PN '
+      'INNER JOIN PRODUTO_NUTRICIONAL PN'
       'ON P.ID_PRODUTO_NUTRICIONA = PN.ID_PRODUTO_NUTRICIONAL '
       'WHERE P.CODPRODUTO = :CODPRODUTO')
     SQLConnection = DM.SQLConnectSiscomsoft
-    Left = 32
-    Top = 24
+    Left = 48
+    Top = 8
   end
 end

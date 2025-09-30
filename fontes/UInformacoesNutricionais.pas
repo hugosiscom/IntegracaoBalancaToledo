@@ -102,38 +102,133 @@ begin
     FormatarValorDecimal(AQuery.FieldByName('SODIO').AsFloat, 5, 1);
 
   // --- PARTE 2: Bloco de dados conforme RDC 429 ---
+
+  var
+  UnidadePorcaoN429 := AQuery.FieldByName('UNIDADE_PORCAO').AsString;
+  var
+  alto_acucar_adicionado := '0';
+  var
+  alto_gordura_saturada := '0';
+  var
+  alto_sodio := '0';
+
+  if (UnidadePorcaoN429 = 'UN') or (UnidadePorcaoN429 = 'G') then
+    UnidadePorcaoN429 := '0'
+  else if UnidadePorcaoN429 = 'ML' then
+    UnidadePorcaoN429 := '1';
+
+  if AQuery.FieldByName('ALTO_ACUCAR_ADICIONADO').AsString = 'S' then
+    alto_acucar_adicionado := '1';
+
+  if AQuery.FieldByName('ALTO_GORDURA_SATURADA').AsString = 'S' then
+    alto_gordura_saturada := '1';
+
+  if AQuery.FieldByName('ALTO_SODIO').AsString = 'S' then
+    alto_sodio := '1';
+
   if rbSelecionado = 1 then
+  begin
+    LinhaRDC360 := LinhaRDC360 + '0000';
     LinhaRDC429 := '|';
+  end;
 
   LinhaRDC429 := LinhaRDC429 +
 
-  // Campos que não existem na sua DDL (Açúcares), mantemos como zero.
-    FormatarValorDecimal(0, 4, 1) + // Açúcares Totais
-    FormatarValorDecimal(0, 4, 1) + // Açúcares Adicionados
-  // Campos existentes na sua DDL
-    FormatarValorDecimal(AQuery.FieldByName('COLESTEROL').AsFloat, 3, 0) +
-    FormatarValorDecimal(AQuery.FieldByName('CALCIO').AsFloat, 5, 0) +
-    FormatarValorDecimal(AQuery.FieldByName('FERRO').AsFloat, 3, 2) +
-  // Campos de %VD existentes na sua DDL
-    FormatarCampoNumerico(AQuery.FieldByName('GORDURAS_SATURADAS_VD').AsString, 2) +
-    FormatarCampoNumerico(AQuery.FieldByName('GORDURAS_TRANS_VD').AsString, 2) +
-    FormatarCampoNumerico(AQuery.FieldByName('SODIO_VD').AsString, 2) +
-    FormatarValorDecimal(AQuery.FieldByName('VALOR_CALORICO_VD').AsFloat, 4, 0) +
-    FormatarValorDecimal(AQuery.FieldByName('CARBOIDRATOS_VD').AsFloat, 4, 1) + FormatarValorDecimal(0, 4, 1) +
-  // %VD Açúcares Totais (não existe na DDL)
-    FormatarValorDecimal(0, 4, 1) + // %VD Açúcares Adicionados (não existe na DDL)
-    FormatarValorDecimal(AQuery.FieldByName('PROTEINAS_VD').AsFloat, 3, 1) +
-    FormatarValorDecimal(AQuery.FieldByName('GORDURAS_TOTAIS_VD').AsFloat, 3, 1) +
-    FormatarValorDecimal(AQuery.FieldByName('COLESTEROL_VD').AsFloat, 3, 1) +
-    FormatarValorDecimal(AQuery.FieldByName('FIBRA_ALIMENTAR_VD').AsFloat, 3, 1) +
-    FormatarValorDecimal(AQuery.FieldByName('CALCIO_VD').AsFloat, 3, 1) +
-    FormatarValorDecimal(AQuery.FieldByName('FERRO_VD').AsFloat, 5, 1) + '000'; // Reservado (3 posições)
+  // Calcula Automaticamente a Quantidade de Porções por Embalagem
+    'N' +
+
+  // Quantidade de Porções por Embalagem
+    FormatarValorDecimal(AQuery.FieldByName('PORCAO').AsInteger, 3, 0) +
+
+  // Quantidade da Porção
+    FormatarValorDecimal(AQuery.FieldByName('QUANTIDADE').AsFloat, 3, 0) +
+
+  // Unidade da Porção
+    UnidadePorcaoN429 +
+
+  // Parte Inteira da Medida Caseira
+    FormatarCampoNumerico(AQuery.FieldByName('QTD_INTEIRA').AsString, 2) +
+
+  // Parte Decimal da Medida Caseira
+    ParteDecimal +
+
+  // Medida Caseira Utilizada
+    MedidaCaseira +
+
+  // Valor Energético
+    FormatarValorDecimal(AQuery.FieldByName('VALOR_CALORICO').AsFloat, 4, 0) +
+
+  // Carboidratos
+    FormatarValorDecimal(AQuery.FieldByName('CARBOIDRATOS').AsFloat, 4, 1) +
+
+  // Açúcares Totais
+    FormatarValorDecimal(AQuery.FieldByName('ACUCARES_TOTAIS').AsFloat, 3, 1) +
+
+  // Açúcares Adicionados
+    FormatarValorDecimal(AQuery.FieldByName('ACUCARES_ADICIONADOS').AsFloat, 3, 1) +
+
+  // Proteinas
+    FormatarValorDecimal(AQuery.FieldByName('PROTEINAS').AsFloat, 3, 1) +
+
+  // Gorduras Totais
+    FormatarValorDecimal(AQuery.FieldByName('GORDURAS_TOTAIS').AsFloat, 3, 1) +
+
+  // Gorduras Saturadas
+    FormatarValorDecimal(AQuery.FieldByName('GORDURAS_SATURADAS').AsFloat, 3, 1) +
+
+  // Gorduras Trans
+    FormatarValorDecimal(AQuery.FieldByName('GORDURAS_TRANS').AsFloat, 3, 1) +
+
+  // Fibra Alimentar
+    FormatarValorDecimal(AQuery.FieldByName('FIBRA_ALIMENTAR').AsFloat, 3, 1) +
+
+  // Sódio
+    FormatarValorDecimal(AQuery.FieldByName('SODIO').AsFloat, 5, 1) +
+
+  // alto em açúcar adicionado
+    alto_acucar_adicionado +
+
+  // alto em gordura saturada
+    alto_gordura_saturada +
+
+  // alto em sódio
+    alto_sodio +
+
+  // Lactose
+    FormatarValorDecimal(AQuery.FieldByName('LACTOSE').AsFloat, 5, 1) +
+
+  // Galactose
+    FormatarValorDecimal(AQuery.FieldByName('GALACTOSE').AsFloat, 5, 1) +
+
+  // Imprime Lactose e Galactose
+    '1' +
+
+  // Açucares Adicionados Estendido | Caso preenchido, o valor informado no campo "Açucares Adicionados" será ignorado.
+    ''.PadLeft(5, '0') +
+
+  // Açucares Totais Estendido | Caso preenchido, o valor informado no campo "Açucares Totais" será ignorado.
+    ''.PadLeft(5, '0') +
+
+  // Gorduras Totais Estendido | Caso preenchido, o valor informado no campo "Gorduras Totais" será ignorado.
+    ''.PadLeft(5, '0') +
+
+  // Proteinas Estendido | Caso preenchido, o valor informado no campo "Proteinas" será ignorado.
+    ''.PadLeft(5, '0') +
+
+  // Utiliza fração de medida caseira personalizada
+    '0' +
+
+  // Numerador da fração de medida caseira personalizada
+    '000' +
+
+  // Denominador da fração de medida caseira personalizada
+    '000';
 
   if rbSelecionado = 0 then
     Result := LinhaRDC360
   else if rbSelecionado = 1 then
     // MGV7
-    Result := LinhaRDC360 + '0000' + LinhaRDC429
+    Result := LinhaRDC360 + LinhaRDC429
   else if rbSelecionado = 2 then
     // MGV7
     Result := LinhaRDC429
@@ -160,6 +255,8 @@ begin
 
   var
   ListaLinhas := TStringList.Create;
+  var
+  ListaDeIDProdutoNutricional := TStringList.Create;
 
   try
     LDataSetProdutos.First;
@@ -171,20 +268,28 @@ begin
 
       if not SQLNutricional.IsEmpty then
       begin
-        ListaLinhas.Add(CriarLinhaNutricional(SQLNutricional));
+        var
+        IdNutricional := SQLNutricional.FieldByName('ID_PRODUTO_NUTRICIONAL').AsString;
+
+        if ListaDeIDProdutoNutricional.IndexOf(IdNutricional) = -1 then
+        begin
+          ListaDeIDProdutoNutricional.Add(IdNutricional);
+
+          var
+          linha := CriarLinhaNutricional(SQLNutricional);
+
+          if ListaLinhas.IndexOf(linha) = -1 then
+            ListaLinhas.Add(linha);
+        end;
       end;
 
       LDataSetProdutos.Next;
     end;
 
     if ListaLinhas.Count > 0 then
-    begin
-      ListaLinhas.SaveToFile(ExtractFilePath(ACaminhoArquivo) + 'Infnutri.txt');
-    end
+      ListaLinhas.SaveToFile(ExtractFilePath(ACaminhoArquivo) + 'Infnutri.txt')
     else
-    begin
       ShowMessage('Nenhuma informação nutricional encontrada para os produtos selecionados.');
-    end;
   finally
     ListaLinhas.Free;
   end;

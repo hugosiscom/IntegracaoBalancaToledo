@@ -115,17 +115,16 @@ uses Udm, UUtilidade, UInformacoesNutricionais;
 procedure TFrmprincipal.BtnToledoClick(Sender: TObject);
 begin
   if rgNomeArquivo.ItemIndex = 0 then
-     SaveDialog1.FileName := 'TXITENS.TXT'
-     else
-     if rgNomeArquivo.ItemIndex = 1 then
-        SaveDialog1.FileName := 'Itensmgv.txt';
+    SaveDialog1.FileName := 'TXITENS.TXT'
+  else if rgNomeArquivo.ItemIndex = 1 then
+    SaveDialog1.FileName := 'Itensmgv.txt';
 
   if SaveDialog1.Execute then
-     begin
-       edtDiretorio.Text := SaveDialog1.FileName;
-     end;
+  begin
+    edtDiretorio.Text := SaveDialog1.FileName;
+  end;
   if FileExists(edtDiretorio.Text) then
-     DeleteFile(edtDiretorio.Text);
+    DeleteFile(edtDiretorio.Text);
 
 end;
 
@@ -501,6 +500,9 @@ begin
     rgCodigo.ItemIndex := Ini.ReadInteger('Configuracao', 'TipoCodigo', 0);
     if not RbtToleo.Checked then
       RbtFilizola.Checked := true;
+    cbxInfoNutri.Checked := Ini.ReadBool('Configuracao', 'cbxInfoNutri', false);
+    rgNomeArquivo.ItemIndex := Ini.ReadInteger('Configuracao', 'rgNomeArquivo', 0);
+    rdgNorma.ItemIndex := Ini.ReadInteger('Configuracao', 'rdgNorma', 0);
 
   finally
     Ini.Free;
@@ -808,7 +810,8 @@ begin
       // Impressão da Data de Embalagem 1 -- sim -- 0 não
         '1' +
       // Cód. Fornecedor
-        dm.CDSProdutosCODFORNECEDOR.AsString.PadLeft(4, '0') +
+      // dm.CDSProdutosCODFORNECEDOR.AsString.PadLeft(4, '0') +
+        '0000' + // Sem fornecedores
       // Lote
         ''.PadLeft(12, '0') +
       // Código EAN-13 Especial
@@ -892,6 +895,9 @@ begin
     Ini.WriteInteger('Configuracao', 'CodEmpresa', StrToInt(EdtCodEmpresa.Text));
     Ini.WriteBool('Configuracao', 'ModBalToledo', RbtToleo.Checked);
     Ini.WriteInteger('Configuracao', 'TipoCodigo', rgCodigo.ItemIndex);
+    Ini.WriteInteger('Configuracao', 'rdgNorma', rdgNorma.ItemIndex);
+    Ini.WriteInteger('Configuracao', 'rgNomeArquivo', rgNomeArquivo.ItemIndex);
+    Ini.WriteBool('Configuracao', 'cbxInfoNutri', cbxInfoNutri.Checked);
   finally
     Ini.Free;
   end;
@@ -1013,7 +1019,7 @@ begin
     exit;
   end;
 
-  Fname := EdtDiretorio.Text;
+  Fname := edtDiretorio.Text;
   AssignFile(Arquivo, Fname);
   Rewrite(Arquivo);
   Screen.Cursor := crHourglass;
