@@ -30,13 +30,13 @@ object Frmprincipal: TFrmprincipal
     object edtDiretorio: TEdit
       Left = 7
       Top = 18
-      Width = 602
+      Width = 598
       Height = 21
       TabOrder = 0
     end
     object BtnToledo: TBitBtn
-      Left = 621
-      Top = 14
+      Left = 617
+      Top = 16
       Width = 48
       Height = 25
       Glyph.Data = {
@@ -86,7 +86,7 @@ object Frmprincipal: TFrmprincipal
       OnClick = BtnToledoClick
     end
     object cbxInfoNutri: TCheckBox
-      Left = 878
+      Left = 671
       Top = 22
       Width = 97
       Height = 17
@@ -699,15 +699,15 @@ object Frmprincipal: TFrmprincipal
     Caption = 'Diret'#243'rio de Sa'#237'da Filizola'
     TabOrder = 6
     object edtDiretorioF: TEdit
-      Left = 3
+      Left = 7
       Top = 18
-      Width = 602
+      Width = 598
       Height = 21
       TabOrder = 0
     end
     object BitBtn9: TBitBtn
       Left = 617
-      Top = 17
+      Top = 16
       Width = 48
       Height = 25
       Glyph.Data = {

@@ -115,16 +115,17 @@ uses Udm, UUtilidade, UInformacoesNutricionais;
 procedure TFrmprincipal.BtnToledoClick(Sender: TObject);
 begin
   if rgNomeArquivo.ItemIndex = 0 then
-    SaveDialog1.FileName := 'TXITENS.TXT'
-  else if rgNomeArquivo.ItemIndex = 1 then
-    SaveDialog1.FileName := 'Itensmgv.txt';
+     SaveDialog1.FileName := 'TXITENS.TXT'
+     else
+     if rgNomeArquivo.ItemIndex = 1 then
+        SaveDialog1.FileName := 'Itensmgv.txt';
 
   if SaveDialog1.Execute then
-  begin
-    edtDiretorio.Text := SaveDialog1.FileName;
-  end;
+     begin
+       edtDiretorio.Text := SaveDialog1.FileName;
+     end;
   if FileExists(edtDiretorio.Text) then
-    DeleteFile(edtDiretorio.Text);
+     DeleteFile(edtDiretorio.Text);
 
 end;
 
@@ -1012,7 +1013,7 @@ begin
     exit;
   end;
 
-  Fname := edtDiretorio.Text;
+  Fname := EdtDiretorio.Text;
   AssignFile(Arquivo, Fname);
   Rewrite(Arquivo);
   Screen.Cursor := crHourglass;
