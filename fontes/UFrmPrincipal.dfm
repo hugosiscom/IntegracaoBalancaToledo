@@ -265,11 +265,12 @@ object Frmprincipal: TFrmprincipal
       Width = 359
       Height = 38
       Caption = 'Nome do Arquivo'
-      Columns = 2
+      Columns = 3
       ItemIndex = 0
       Items.Strings = (
         'TXITENS (MGV 5)'
-        'Itensmgv (MGV 6)')
+        'Itensmgv (MGV 6)'
+        'Itensmgv (MGV 7)')
       TabOrder = 2
     end
   end
@@ -762,13 +763,12 @@ object Frmprincipal: TFrmprincipal
       Width = 296
       Height = 36
       Caption = 'Norma Informa'#231#227'o Nutricional'
-      Columns = 3
+      Columns = 2
       DragMode = dmAutomatic
       ItemIndex = 0
       Items.Strings = (
         '360'
-        '360 + 429'
-        '429')
+        '360 + 429')
       TabOrder = 2
       Visible = False
     end
@@ -843,6 +843,7 @@ object Frmprincipal: TFrmprincipal
         3DFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF1DA43538B45446
         BC6642B8632BA649138C2AFF00FFFF00FFFF00FFFF00FFFF00FF}
       TabOrder = 2
+      OnClick = BitBtn4Click
     end
     object BitBtn5: TBitBtn
       Left = 221
@@ -878,6 +879,7 @@ object Frmprincipal: TFrmprincipal
         E0FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF0030E81747FF2D
         59FF2552FF0034FC0029C6FF00FFFF00FFFF00FFFF00FFFF00FF}
       TabOrder = 3
+      OnClick = BitBtn5Click
     end
   end
   object SaveDialog1: TSaveDialog

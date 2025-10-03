@@ -333,7 +333,7 @@ begin
   begin
     if rgNomeArquivo.ItemIndex = 0 then
       GerarTxtToledo
-    else if rgNomeArquivo.ItemIndex = 1 then
+    else if (rgNomeArquivo.ItemIndex = 1) or (rgNomeArquivo.ItemIndex = 2) then
       GerarItensmgv;
 
     if cbxInfoNutri.Checked then
@@ -783,92 +783,109 @@ begin
       if (ValorVenda <= 0) or (Pausado = 'S') then
         ValorVenda := dm.CDSProdutosPRCVENDA.AsCurrency;
 
+      var
+      DescricaoCompleta := Trim(dm.CDSProdutosDESCPROD.AsString);
+
+      // 2. Trunca a string se ela for maior que 50 caracteres
+      if Length(DescricaoCompleta) > 50 then
+        DescricaoCompleta := copy(DescricaoCompleta, 1, 50);
+
+      // 3. Completa com espaços até atingir 50 caracteres (usando a função PadRight)
+      DescricaoCompleta := DescricaoCompleta.PadRight(50, ' ');
+
       // --- Montagem da String Final (forma direta e segura) ---
       OutString :=
-      // Posição 01-02: Código do Departamento
+      // Posição 01-02: Código do Departamento  DD
         dpto +
-      // Posição 03-03: Tipo de Produto
+      // Posição 03-03: Tipo de Produto         T
         TipoVenda +
-      // Posição 04-09: Código do Item
+      // Posição 04-09: Código do Item          CCCCCC
         Codigo +
-      // Posição 10-15: Preço do Item
+      // Posição 10-15: Preço do Item           PPPPPP
         StrZero(StrToInt(SoNumero(FormatCurr('0.00', ValorVenda))), 6) +
-      // Posição 16-18: Dias de Validade
+      // Posição 16-18: Dias de Validade        VVV
         StrZero(dm.CDSProdutosPRZVAL.AsInteger, 3) +
-      // Posição 19-43: Descrição do Produto (Alinhado à Esquerda)
-        PadDireita(Trim(dm.CDSProdutosDESCPROD.AsString), 25) +
-      // Posição 44-44: Descrição Segunda linha
-        PadDireita('', 25) +
-      // Código da Informação Extra do item
-        '000000' +
-      // Código da Imagem do Item
-        '0000' +
-      // Código da informação Nutricional
+      // Posição 19-43: Descrição do Produto (Alinhado à Esquerda) D1
+
+      { (Trim(dm.CDSProdutosDESCPROD.AsString)).PadLeft(25, ' ') +
+        // Posição 44-44: Descrição Segunda linha  D2
+        ''.PadLeft(25, ' ') + }
+
+        DescricaoCompleta +
+
+      // Código da Informação Extra do item  RRRRRR
+        ''.PadLeft(6, '0') +
+      // Código da Imagem do Item            FFFF
+        ''.PadLeft(4, '0') +
+      // Código da informação Nutricional    IIIIII
         dm.CDSProdutosID_PRODUTO_NUTRICIONA.AsString.PadLeft(6, '0') +
-      // Impressão de Data de Validade 1 -- sim -- 0 não
-        '1' +
-      // Impressão da Data de Embalagem 1 -- sim -- 0 não
-        '1' +
-      // Cód. Fornecedor
+      // Impressão de Data de Validade 1 -- sim -- 0 não DV
+        '0' +
+      // Impressão da Data de Embalagem 1 -- sim -- 0 não  DE
+        '0' +
+      // Cód. Fornecedor                                   CF
       // dm.CDSProdutosCODFORNECEDOR.AsString.PadLeft(4, '0') +
-        '0000' + // Sem fornecedores
-      // Lote
+        ''.PadLeft(4, '0') + // Sem fornecedores
+      // Lote                       L
         ''.PadLeft(12, '0') +
-      // Código EAN-13 Especial
+      // Código EAN-13 Especial      G
         ''.PadLeft(11, '0') +
-      // PadDireita('', 11) +
+      // PadDireita('', 11) +  Z
       // Versão do preço
         ''.PadLeft(1, '0') +
-      // PadDireita('', 1) +
-      // Código do Som
+
+      // glacial
+      { if rgNomeArquivo.ItemIndex = 2 then
+        OutString := OutString + ''.PadLeft(4, '0'); }
+
+      // Código do Som CS
         ''.PadLeft(4, '0') +
-      // Código de Tara Pré-determinada
+      // Código de Tara Pré-determinada CT
         ''.PadLeft(4, '0') +
-      // Código do Fracionador
+      // Código do Fracionador            FR
         ''.PadLeft(4, '0') +
-      // Código do Campo Extra 1
+      // Código do Campo Extra 1            CE1
         ''.PadLeft(4, '0') +
-      // Código do Campo Extra 2
+      // Código do Campo Extra 2            CE2
         ''.PadLeft(4, '0') +
-      // Código da Conservação
+      // Código da Conservação               CON
         ''.PadLeft(4, '0') +
-      // EAN - 13 de Fornecedor
+      // EAN - 13 de Fornecedor              EAN
         ''.PadLeft(12, '0') +
-      // Percentual de Glaciamento
+      // Percentual de Glaciamento            GL
         ''.PadLeft(6, '0') + '|' +
-      // Sequencia de departamentos associados
-        ''.PadLeft(2, '0') + '|' +
-      // Descritivo do Item – Terceira Linha
+      // Sequencia de departamentos associados  DA
+        dpto + '|' +
+      // Descritivo do Item – Terceira Linha   D3
         ''.PadLeft(35, ' ') +
-      // Descritivo do Item – Quarta Linha
+      // Descritivo do Item – Quarta Linha     D4
         ''.PadLeft(35, ' ') +
-      // PadDireita('', 35) +
-      // Código do Campo Extra 3
+      // Código do Campo Extra 3            CE3
         ''.PadLeft(6, '0') +
-      // Código do Campo Extra 4
+      // Código do Campo Extra 4            CE4
         ''.PadLeft(6, '0') +
-      // Código da mídia (Prix 6 Touch)
+      // Código da mídia (Prix 6 Touch)     MIDIA
         ''.PadLeft(6, '0') +
-      // Preço Promocional - Preço/kg ou Preço/Unid. do item
+      // Preço Promocional - Preço/kg ou Preço/Unid. do item PPPPPP
         ''.PadLeft(6, '0') +
-      // [0] = Utiliza o fornecedor associado  [1] = Balança solicita fornecedor após chamada do PLU
+      // [0] = Utiliza o fornecedor associado  [1] = Balança solicita fornecedor após chamada do PLU SF
         '0' +
-      // Código de Fornecedor Associado, de no máximo 4 bytes, utilizado no cadastro de fornecedores do MGV Obs:
+      // Código de Fornecedor Associado, de no máximo 4 bytes, utilizado no cadastro de fornecedores do MGV Obs:  |FFFF|
       // O código do fornecedor (de 6 bytes) utilizado no padrão RECFOR não pode ser utilizado para esta associação.
       // Ex: Para associar fornecedores 2 e 5: |00020005|
         '|' + ''.PadLeft(4, '0') + '|' +
-      // [0] = Não solicita tara na balança  [1] = Solicita Tara na Balança
+      // [0] = Não solicita tara na balança  [1] = Solicita Tara na Balança ST
         '0' +
-      // Sequência de balanças onde o item não estará ativo.
+      // Sequência de balanças onde o item não estará ativo. |BNA|
       // Ex: Para associar balanças 2 e 5 com itens inativos: |0205|
         '|' + ''.PadLeft(2, '0') + '|' +
-      // Código EAN-13 Especial
+      // Código EAN-13 Especial G1
         ''.PadLeft(12, '0') +
-      // Percentual de Glaciamento
-      // Informação que será utilizada apenas para integração com o MGV Cloud.
-      // EX: 12, 33 = " 1233 "
-
+      // Percentual de Glaciamento PG
         ''.PadLeft(4, '0');
+
+      if rgNomeArquivo.ItemIndex = 2 then
+        OutString := OutString + ''.PadLeft(6, '0') + '|' + ''.PadLeft(4, '0') + '|';
 
       Writeln(Arquivo, OutString);
       dm.CDSProdutos.Next;

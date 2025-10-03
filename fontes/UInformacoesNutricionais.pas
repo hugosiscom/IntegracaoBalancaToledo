@@ -88,8 +88,9 @@ begin
   rbSelecionado := Frmprincipal.rdgNorma.ItemIndex;
 
   // --- PARTE 1: Bloco de dados conforme RDC 359/360 ---
-  LinhaRDC360 := 'N' + FormatarCampoNumerico(AQuery.FieldByName('ID_PRODUTO_NUTRICIONAL').AsString, 6) + '0' +
-  // Versão da Tabela (0 para RDC 359/360)
+  LinhaRDC360 := 'N' +
+  // Versão da Tabela (RDC 359/360)
+    FormatarCampoNumerico(AQuery.FieldByName('ID_PRODUTO_NUTRICIONAL').AsString, 6) + '0' +
     FormatarValorDecimal(AQuery.FieldByName('QUANTIDADE').AsFloat, 3, 0) + UnidadePorcao +
     FormatarCampoNumerico(AQuery.FieldByName('QTD_INTEIRA').AsString, 2) + ParteDecimal + MedidaCaseira +
     FormatarValorDecimal(AQuery.FieldByName('VALOR_CALORICO').AsFloat, 4, 0) +
@@ -135,103 +136,102 @@ begin
   LinhaRDC429 := LinhaRDC429 +
 
   // Calcula Automaticamente a Quantidade de Porções por Embalagem
-    'N' +
+    '1' + // N
 
-  // Quantidade de Porções por Embalagem
+  // Quantidade de Porções por Embalagem     MMMM
     FormatarValorDecimal(AQuery.FieldByName('PORCAO').AsInteger, 3, 0) +
 
-  // Quantidade da Porção
+  // Quantidade da Porção          BBB
     FormatarValorDecimal(AQuery.FieldByName('QUANTIDADE').AsFloat, 3, 0) +
 
-  // Unidade da Porção
+  // Unidade da Porção            D
     UnidadePorcaoN429 +
 
-  // Parte Inteira da Medida Caseira
+  // Parte Inteira da Medida Caseira       EE
     FormatarCampoNumerico(AQuery.FieldByName('QTD_INTEIRA').AsString, 2) +
 
-  // Parte Decimal da Medida Caseira
+  // Parte Decimal da Medida Caseira         F
     ParteDecimal +
 
-  // Medida Caseira Utilizada
+  // Medida Caseira Utilizada                 GG
     MedidaCaseira +
 
-  // Valor Energético
+  // Valor Energético    EEEE
     FormatarValorDecimal(AQuery.FieldByName('VALOR_CALORICO').AsFloat, 4, 0) +
 
-  // Carboidratos
+  // Carboidratos  IIII
     FormatarValorDecimal(AQuery.FieldByName('CARBOIDRATOS').AsFloat, 4, 1) +
 
-  // Açúcares Totais
+  // Açúcares Totais   JJJ
     FormatarValorDecimal(AQuery.FieldByName('ACUCARES_TOTAIS').AsFloat, 3, 1) +
 
-  // Açúcares Adicionados
+  // Açúcares Adicionados  KKK
     FormatarValorDecimal(AQuery.FieldByName('ACUCARES_ADICIONADOS').AsFloat, 3, 1) +
 
-  // Proteinas
+  // Proteinas   LLL
     FormatarValorDecimal(AQuery.FieldByName('PROTEINAS').AsFloat, 3, 1) +
 
-  // Gorduras Totais
+  // Gorduras Totais       NNN
     FormatarValorDecimal(AQuery.FieldByName('GORDURAS_TOTAIS').AsFloat, 3, 1) +
 
-  // Gorduras Saturadas
+  // Gorduras Saturadas  OOO
     FormatarValorDecimal(AQuery.FieldByName('GORDURAS_SATURADAS').AsFloat, 3, 1) +
 
-  // Gorduras Trans
+  // Gorduras Trans   PPP
     FormatarValorDecimal(AQuery.FieldByName('GORDURAS_TRANS').AsFloat, 3, 1) +
 
-  // Fibra Alimentar
+  // Fibra Alimentar   QQQ
     FormatarValorDecimal(AQuery.FieldByName('FIBRA_ALIMENTAR').AsFloat, 3, 1) +
 
-  // Sódio
+  // Sódio     UUUUU
     FormatarValorDecimal(AQuery.FieldByName('SODIO').AsFloat, 5, 1) +
 
-  // alto em açúcar adicionado
+  // alto em açúcar adicionado     R
     alto_acucar_adicionado +
 
-  // alto em gordura saturada
+  // alto em gordura saturada      S
     alto_gordura_saturada +
 
-  // alto em sódio
+  // alto em sódio                  T
     alto_sodio +
 
-  // Lactose
+  // Lactose  LLLLL
     FormatarValorDecimal(AQuery.FieldByName('LACTOSE').AsFloat, 5, 1) +
 
-  // Galactose
+  // Galactose   GGGGG
     FormatarValorDecimal(AQuery.FieldByName('GALACTOSE').AsFloat, 5, 1) +
 
-  // Imprime Lactose e Galactose
+  // Imprime Lactose e Galactose  W
     '1' +
 
-  // Açucares Adicionados Estendido | Caso preenchido, o valor informado no campo "Açucares Adicionados" será ignorado.
-    ''.PadLeft(5, '0') +
+  // Açucares Adicionados Estendido | Caso preenchido, o valor informado no campo "Açucares Adicionados" será ignorado. AAAAA
+    ''.PadLeft(5, ' ') +
 
-  // Açucares Totais Estendido | Caso preenchido, o valor informado no campo "Açucares Totais" será ignorado.
-    ''.PadLeft(5, '0') +
+  // Açucares Totais Estendido | Caso preenchido, o valor informado no campo "Açucares Totais" será ignorado. BBBBB
+    ''.PadLeft(5, ' ') +
 
-  // Gorduras Totais Estendido | Caso preenchido, o valor informado no campo "Gorduras Totais" será ignorado.
-    ''.PadLeft(5, '0') +
+  // Gorduras Totais Estendido | Caso preenchido, o valor informado no campo "Gorduras Totais" será ignorado. CCCCC
+    ''.PadLeft(5, ' ') +
 
-  // Proteinas Estendido | Caso preenchido, o valor informado no campo "Proteinas" será ignorado.
-    ''.PadLeft(5, '0') +
+  // Proteinas Estendido | Caso preenchido, o valor informado no campo "Proteinas" será ignorado.             DDDDD
+    ''.PadLeft(5, ' ') +
 
-  // Utiliza fração de medida caseira personalizada
+  // Utiliza fração de medida caseira personalizada E
     '0' +
 
-  // Numerador da fração de medida caseira personalizada
+  // Numerador da fração de medida caseira personalizada  FFF
     '000' +
 
-  // Denominador da fração de medida caseira personalizada
+  // Denominador da fração de medida caseira personalizada GGG
     '000';
+
+  // YYY
 
   if rbSelecionado = 0 then
     Result := LinhaRDC360
   else if rbSelecionado = 1 then
     // MGV7
     Result := LinhaRDC360 + LinhaRDC429
-  else if rbSelecionado = 2 then
-    // MGV7
-    Result := LinhaRDC429
   else
     Exception.Create('Opção inválida para o radioGroup');
 end;
