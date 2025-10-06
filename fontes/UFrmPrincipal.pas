@@ -818,11 +818,17 @@ begin
       // Código da Imagem do Item            FFFF
         ''.PadLeft(4, '0') +
       // Código da informação Nutricional    IIIIII
-        dm.CDSProdutosID_PRODUTO_NUTRICIONA.AsString.PadLeft(6, '0') +
+        dm.CDSProdutosID_PRODUTO_NUTRICIONA.AsString.PadLeft(6, '0');
       // Impressão de Data de Validade 1 -- sim -- 0 não DV
-        '0' +
+
+      if dm.CDSProdutosPRZVAL.AsInteger > 0 then
+        OutString := OutString + '1'
+      else
+        OutString := OutString + '0';
+
+      OutString := OutString +
       // Impressão da Data de Embalagem 1 -- sim -- 0 não  DE
-        '0' +
+        '1' +
       // Cód. Fornecedor                                   CF
       // dm.CDSProdutosCODFORNECEDOR.AsString.PadLeft(4, '0') +
         ''.PadLeft(4, '0') + // Sem fornecedores

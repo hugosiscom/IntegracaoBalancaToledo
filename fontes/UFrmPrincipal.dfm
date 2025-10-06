@@ -496,6 +496,7 @@ object Frmprincipal: TFrmprincipal
           Caption = 'Descri'#231#227'o'
           Width = 250
         end>
+      Items.ItemData = {050000000000000000}
       SortType = stText
       TabOrder = 0
       ViewStyle = vsReport
@@ -604,6 +605,7 @@ object Frmprincipal: TFrmprincipal
           Caption = 'Descri'#231#227'o'
           Width = 250
         end>
+      Items.ItemData = {050000000000000000}
       SortType = stText
       TabOrder = 0
       ViewStyle = vsReport
@@ -794,6 +796,7 @@ object Frmprincipal: TFrmprincipal
           Caption = 'Descri'#231#227'o'
           Width = 280
         end>
+      Items.ItemData = {050000000000000000}
       SortType = stText
       TabOrder = 0
       ViewStyle = vsReport
