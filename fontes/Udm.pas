@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, Buttons, ComCtrls, IniFiles, ExtCtrls, Grids,
-  DBGrids, FMTBcd, DB, SqlExpr, Gauges, DBClient, Provider, Mask,midaslib,
+  DBGrids, FMTBcd, DB, SqlExpr, Gauges, DBClient, Provider, Mask, midaslib,
   WideStrings, SqlConst, DBXInterbase, DBXFirebird;
 
 type
@@ -218,7 +218,8 @@ type
     { Private declarations }
   public
     { Public declarations }
-    function RetornaPromocao(iCodProduto,iCodEmpresa:Integer;dDataVenda: TDateTime;var Pausado:String):Double;
+    function RetornaPromocao(iCodProduto, iCodEmpresa: Integer; dDataVenda: TDateTime; var Pausado: String): Double;
+    function temInformacaoExtra(AQuery: TSQLQuery): Boolean;
   end;
 
 var
@@ -234,128 +235,158 @@ procedure TDM.DataModuleCreate(Sender: TObject);
 begin
   SQLConnectSiscomsoft.Connected := False;
   SQLConnectSiscomsoft.LoadParamsFromIniFile('.\connections.ini');
-  dm.SQLConnectSiscomsoft.Params.Values[szPASSWORD] := Decode(dm.SQLConnectSiscomsoft.Params.Values[szPASSWORD]);
+  DM.SQLConnectSiscomsoft.Params.Values[szPASSWORD] := Decode(DM.SQLConnectSiscomsoft.Params.Values[szPASSWORD]);
 end;
 
 function TDM.RetornaPromocao(iCodProduto, iCodEmpresa: Integer; dDataVenda: TDateTime; var Pausado: String): Double;
 var
-  DiaValido,DataValida,HoraValida,ProPausada:Boolean;
-  DataVenda,DataInicio,DataFim:TDateTime;
-  HoraVenda,HoraInicio,HoraFim:TDateTime;
-//  Pausado:String;
-  DiadaSemana:Integer;
+  DiaValido, DataValida, HoraValida, ProPausada: Boolean;
+  DataVenda, DataInicio, DataFim: TDateTime;
+  HoraVenda, HoraInicio, HoraFim: TDateTime;
+  // Pausado:String;
+  DiadaSemana: Integer;
 begin
- { Result := 0;
- //Busca produto em promoção - Hugo Fabrício - 29/07/2014
-  CDSPromocao.Close;
-  CDSPromocao.Params[0].AsInteger := iCodEmpresa;
-  CDSPromocao.Params[1].AsInteger := iCodProduto;
-  CDSPromocao.Params[2].AsDateTime := dDataVenda;
-  CDSPromocao.Open;
-  Pausado := CDSPromocaoPAUSADO.AsString;
-  if (CDSPromocao.RecordCount >0) and (CDSPromocaoPAUSADO.AsString <>'S') then
-     Result := CDSPromocaoVALOR_PROMOCAO.AsCurrency;`}
+  { Result := 0;
+    //Busca produto em promoção - Hugo Fabrício - 29/07/2014
+    CDSPromocao.Close;
+    CDSPromocao.Params[0].AsInteger := iCodEmpresa;
+    CDSPromocao.Params[1].AsInteger := iCodProduto;
+    CDSPromocao.Params[2].AsDateTime := dDataVenda;
+    CDSPromocao.Open;
+    Pausado := CDSPromocaoPAUSADO.AsString;
+    if (CDSPromocao.RecordCount >0) and (CDSPromocaoPAUSADO.AsString <>'S') then
+    Result := CDSPromocaoVALOR_PROMOCAO.AsCurrency;` }
   Result := 0;
-  DiaValido:=True;
-  DataValida:=True;
-  HoraValida:= True;
+  DiaValido := True;
+  DataValida := True;
+  HoraValida := True;
   ProPausada := False;
 
-  DataVenda :=StrToDateTime (FormatDateTime('dd/MM/yyyy',dDataVenda));
-  HoraVenda :=StrToDateTime (FormatDateTime('hh:MM:ss',dDataVenda));
+  DataVenda := StrToDateTime(FormatDateTime('dd/MM/yyyy', dDataVenda));
+  HoraVenda := StrToDateTime(FormatDateTime('hh:MM:ss', dDataVenda));
 
   CDSPromocao.Close;
-  CDSPromocao.CommandText:=
-  ' select PM.* from PROMOCOES PM                                 '+
-  ' where PM.CODEMPRESA=:CODEMPRESA and PM.CODPRODUTO=:CODPRODUTO '+
-  ' order by PM.DATA_CAD, PM.CODPRODUTO                           ';
+  CDSPromocao.CommandText := ' select PM.* from PROMOCOES PM                                 ' +
+    ' where PM.CODEMPRESA=:CODEMPRESA and PM.CODPRODUTO=:CODPRODUTO ' +
+    ' order by PM.DATA_CAD, PM.CODPRODUTO                           ';
   CDSPromocao.Params[0].AsInteger := iCodEmpresa;
   CDSPromocao.Params[1].AsInteger := iCodProduto;
   CDSPromocao.Open;
 
   CDSPromocao.First;
   while not CDSPromocao.Eof do
+  begin
+    Pausado := CDSPromocaoPAUSADO.AsString;
+    if not(CDSPromocaoDATA_INICIO.IsNull) and not(CDSPromocaoDATA_FIM.IsNull) then
     begin
-      Pausado := CDSPromocaoPAUSADO.AsString;
-      if not (CDSPromocaoDATA_INICIO.IsNull) and  not (CDSPromocaoDATA_FIM.IsNull) then
-         begin
-          DataInicio := CDSPromocaoDATA_INICIO.AsDateTime;
-          DataFim := CDSPromocaoDATA_FIM.AsDateTime;
-           if (DataVenda >= DataInicio)and  (DataVenda <= DataFim)   then
-              DataValida := True
-              else
-              DataValida := False;
-         end
-         else
-         begin
-          DiadaSemana := dayofweek(DataVenda);
-          case DiadaSemana of
-            1:begin
-              if CDSPromocaoDOMINGO.AsString = 'S' then
-                 DiaValido:=True
-                 else
-                 DiaValido :=false;
-            end;
-            2:begin
-              if CDSPromocaoSEGUNDA.AsString = 'S' then
-                 DiaValido :=True
-                 else
-                 DiaValido :=false;
-            end;
-            3:begin
-              if CDSPromocaoTERCA.AsString = 'S' then
-                 DiaValido :=True
-                 else
-                 DiaValido :=false;
-            end;
-            4:begin
-              if CDSPromocaoQUARTA.AsString = 'S' then
-                 DiaValido :=True
-                 else
-                 DiaValido :=false;
-            end;
-            5:begin
-               if CDSPromocaoQUINTA.AsString = 'S' then
-                  DiaValido :=True
-                  else
-                  DiaValido :=false;
-              end;
-            6:begin
-                if CDSPromocaoSEXTA.AsString = 'S' then
-                   DiaValido :=True
-                   else
-                   DiaValido :=false;
-              end;
-            7:begin
-                if CDSPromocaoSABADO.AsString = 'S' then
-                   DiaValido :=True
-                   else
-                   DiaValido :=false;
-            end;
-
+      DataInicio := CDSPromocaoDATA_INICIO.AsDateTime;
+      DataFim := CDSPromocaoDATA_FIM.AsDateTime;
+      if (DataVenda >= DataInicio) and (DataVenda <= DataFim) then
+        DataValida := True
+      else
+        DataValida := False;
+    end
+    else
+    begin
+      DiadaSemana := dayofweek(DataVenda);
+      case DiadaSemana of
+        1:
+          begin
+            if CDSPromocaoDOMINGO.AsString = 'S' then
+              DiaValido := True
+            else
+              DiaValido := False;
+          end;
+        2:
+          begin
+            if CDSPromocaoSEGUNDA.AsString = 'S' then
+              DiaValido := True
+            else
+              DiaValido := False;
+          end;
+        3:
+          begin
+            if CDSPromocaoTERCA.AsString = 'S' then
+              DiaValido := True
+            else
+              DiaValido := False;
+          end;
+        4:
+          begin
+            if CDSPromocaoQUARTA.AsString = 'S' then
+              DiaValido := True
+            else
+              DiaValido := False;
+          end;
+        5:
+          begin
+            if CDSPromocaoQUINTA.AsString = 'S' then
+              DiaValido := True
+            else
+              DiaValido := False;
+          end;
+        6:
+          begin
+            if CDSPromocaoSEXTA.AsString = 'S' then
+              DiaValido := True
+            else
+              DiaValido := False;
+          end;
+        7:
+          begin
+            if CDSPromocaoSABADO.AsString = 'S' then
+              DiaValido := True
+            else
+              DiaValido := False;
           end;
 
-         end;
-      if not (CDSPromocaoHORA_INICIO.IsNull) and  not (CDSPromocaoHORA_FIM.IsNull) then
-         begin
-           HoraInicio := CDSPromocaoHORA_INICIO.AsDateTime;
-           HoraFim := CDSPromocaoHORA_FIM.AsDateTime;
-           if (HoraVenda >= HoraInicio) and (HoraVenda <= HoraFim) then
-               HoraValida := True
-               else
-               HoraValida := False;
+      end;
 
-         end;
-      if Pausado ='S' then
-         ProPausada :=True;
-
-      //if (CDSPromocao.RecordCount >0) and (CDSPromocaoPAUSADO.AsString <>'S') then
-      if DataValida and HoraValida and DiaValido then
-         if not ProPausada then
-            Result := CDSPromocaoVALOR_PROMOCAO.AsCurrency;
-      CDSPromocao.Next;
     end;
+    if not(CDSPromocaoHORA_INICIO.IsNull) and not(CDSPromocaoHORA_FIM.IsNull) then
+    begin
+      HoraInicio := CDSPromocaoHORA_INICIO.AsDateTime;
+      HoraFim := CDSPromocaoHORA_FIM.AsDateTime;
+      if (HoraVenda >= HoraInicio) and (HoraVenda <= HoraFim) then
+        HoraValida := True
+      else
+        HoraValida := False;
+
+    end;
+    if Pausado = 'S' then
+      ProPausada := True;
+
+    // if (CDSPromocao.RecordCount >0) and (CDSPromocaoPAUSADO.AsString <>'S') then
+    if DataValida and HoraValida and DiaValido then
+      if not ProPausada then
+        Result := CDSPromocaoVALOR_PROMOCAO.AsCurrency;
+    CDSPromocao.Next;
+  end;
+end;
+
+function TDM.temInformacaoExtra(AQuery: TSQLQuery): Boolean;
+begin
+  Result := False;
+
+  var
+    idProdutoNutricional: String;
+
+  try
+    idProdutoNutricional := AQuery.FieldByName('ID_PRODUTO_NUTRICIONAL').AsString;
+    try
+      if (AQuery.FieldByName('OBS_INFO_EXTRA').AsString <> '') or (AQuery.FieldByName('INFO_EXTRA').AsString <> '') then
+        Result := True
+      else
+        Result := False;
+    except
+      on E: Exception do
+      begin
+        ShowMessage('Falha ao processar as informações extras do ID_PRODUTO_NUTRICIONAL ' + idProdutoNutricional);
+      end;
+    end;
+  finally
+
+  end;
 end;
 
 end.
-

@@ -817,10 +817,20 @@ begin
         // Posição 44-44: Descrição Segunda linha  D2
         ''.PadLeft(25, ' ') + }
 
-        DescricaoCompleta +
+        DescricaoCompleta;
 
       // Código da Informação Extra do item  RRRRRR
-        dm.CDSProdutosID_PRODUTO_NUTRICIONA.AsString.PadLeft(6, '0') +
+
+      UInformacoesNutricionais.DataModule1.SQLNutricional.Close;
+      UInformacoesNutricionais.DataModule1.SQLNutricional.ParamByName('CODPRODUTO').AsInteger := StrToInt(Codigo);
+      UInformacoesNutricionais.DataModule1.SQLNutricional.Open;
+
+      if dm.temInformacaoExtra(UInformacoesNutricionais.DataModule1.SQLNutricional) then
+        OutString := OutString + dm.CDSProdutosID_PRODUTO_NUTRICIONA.AsString.PadLeft(6, '0')
+      else
+        OutString := OutString + ''.PadLeft(6, '0');
+
+      OutString := OutString +
       // Código da Imagem do Item            FFFF
         ''.PadLeft(4, '0') +
       // Código da informação Nutricional    IIIIII

@@ -328,7 +328,7 @@ begin
   end;
 
   var
-    LDataSetProdutos: TDataSet := ADtsProdutos.DataSet;
+  LDataSetProdutos := ADtsProdutos.DataSet;
 
   if not LDataSetProdutos.Active or (LDataSetProdutos.RecordCount = 0) then
   begin
@@ -346,23 +346,26 @@ begin
     while not LDataSetProdutos.Eof do
     begin
       SQLNutricional.Close;
-      SQLNutricional.Params.ParamByName('CODPRODUTO').AsInteger := LDataSetProdutos.FieldByName('CODPRODUTO').AsInteger;
+      SQLNutricional.ParamByName('CODPRODUTO').AsInteger := LDataSetProdutos.FieldByName('CODPRODUTO').AsInteger;
       SQLNutricional.Open;
 
       if not SQLNutricional.IsEmpty then
       begin
-        var
-        IdNutricional := SQLNutricional.FieldByName('ID_PRODUTO_NUTRICIONAL').AsString;
-
-        if ListaDeInformacoesExtras.IndexOf(IdNutricional) = -1 then
+        if dm.temInformacaoExtra(SQLNutricional) then
         begin
-          ListaDeInformacoesExtras.Add(IdNutricional);
-
           var
-          linha := CriarLinhaInformacaoExtra(SQLNutricional);
+          IdNutricional := SQLNutricional.FieldByName('ID_PRODUTO_NUTRICIONAL').AsString;
 
-          if ListaLinhas.IndexOf(linha) = -1 then
-            ListaLinhas.Add(linha);
+          if ListaDeInformacoesExtras.IndexOf(IdNutricional) = -1 then
+          begin
+            ListaDeInformacoesExtras.Add(IdNutricional);
+
+            var
+            linha := CriarLinhaInformacaoExtra(SQLNutricional);
+
+            if ListaLinhas.IndexOf(linha) = -1 then
+              ListaLinhas.Add(linha);
+          end;
         end;
       end;
 
@@ -372,7 +375,7 @@ begin
     if ListaLinhas.Count > 0 then
       ListaLinhas.SaveToFile(ExtractFilePath(ACaminhoArquivo) + 'Txinfo.txt')
     else
-      ShowMessage('Nenhuma informação nutricional encontrada para os produtos selecionados.');
+      ShowMessage('Nenhuma informação extra encontrada para os produtos selecionados.');
   finally
     ListaLinhas.Free;
   end;
