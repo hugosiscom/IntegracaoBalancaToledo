@@ -86,13 +86,21 @@ object Frmprincipal: TFrmprincipal
       OnClick = BtnToledoClick
     end
     object cbxInfoNutri: TCheckBox
-      Left = 671
+      Left = 679
       Top = 22
       Width = 97
       Height = 17
       Caption = 'Inf. Nutricional'
       TabOrder = 2
       OnClick = cbxInfoNutriClick
+    end
+    object cbxInfoExtra: TCheckBox
+      Left = 822
+      Top = 22
+      Width = 97
+      Height = 17
+      Caption = 'Inf. Extra'
+      TabOrder = 3
     end
   end
   object DBGrid1: TDBGrid
@@ -496,7 +504,6 @@ object Frmprincipal: TFrmprincipal
           Caption = 'Descri'#231#227'o'
           Width = 250
         end>
-      Items.ItemData = {050000000000000000}
       SortType = stText
       TabOrder = 0
       ViewStyle = vsReport
@@ -605,7 +612,6 @@ object Frmprincipal: TFrmprincipal
           Caption = 'Descri'#231#227'o'
           Width = 250
         end>
-      Items.ItemData = {050000000000000000}
       SortType = stText
       TabOrder = 0
       ViewStyle = vsReport
@@ -796,7 +802,6 @@ object Frmprincipal: TFrmprincipal
           Caption = 'Descri'#231#227'o'
           Width = 280
         end>
-      Items.ItemData = {050000000000000000}
       SortType = stText
       TabOrder = 0
       ViewStyle = vsReport

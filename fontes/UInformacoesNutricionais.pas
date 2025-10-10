@@ -18,6 +18,7 @@ type
     // - ASQLProdutos: A sua TSQLQuery que já contém os produtos selecionados.
     // - ACaminhoArquivo: O caminho (pasta) onde o arquivo 'Infnutri.txt' será salvo.
     procedure GerarArquivoNutricional(ADtsProdutos: TDataSource; const ACaminhoArquivo: string);
+    procedure GerarArquivoInformacaoExtra(ADtsProdutos: TDataSource; const ACaminhoArquivo: string);
 
   end;
 
@@ -236,6 +237,18 @@ begin
     Exception.Create('Opção inválida para o radioGroup');
 end;
 
+function CriarLinhaInformacaoExtra(AQuery: TSQLQuery): String;
+begin
+  var
+    linhaExtra: String;
+
+  linhaExtra := FormatarCampoNumerico(AQuery.FieldByName('ID_PRODUTO_NUTRICIONAL').AsString, 6) +
+    AQuery.FieldByName('OBS_INFO_EXTRA').AsString.PadRight(100, ' ') + AQuery.FieldByName('INFO_EXTRA')
+    .AsString.PadRight(1008, ' ');
+
+  Result := linhaExtra;
+end;
+
 procedure TDataModule1.GerarArquivoNutricional(ADtsProdutos: TDataSource; const ACaminhoArquivo: string);
 begin
   if (ADtsProdutos = nil) or (ADtsProdutos.DataSet = nil) then
@@ -288,6 +301,65 @@ begin
 
     if ListaLinhas.Count > 0 then
       ListaLinhas.SaveToFile(ExtractFilePath(ACaminhoArquivo) + 'Infnutri.txt')
+    else
+      ShowMessage('Nenhuma informação nutricional encontrada para os produtos selecionados.');
+  finally
+    ListaLinhas.Free;
+  end;
+end;
+
+procedure TDataModule1.GerarArquivoInformacaoExtra(ADtsProdutos: TDataSource; const ACaminhoArquivo: string);
+begin
+  if (ADtsProdutos = nil) or (ADtsProdutos.DataSet = nil) then
+  begin
+    ShowMessage('A fonte de dados (DataSource) não está configurada.');
+    Exit;
+  end;
+
+  var
+    LDataSetProdutos: TDataSet := ADtsProdutos.DataSet;
+
+  if not LDataSetProdutos.Active or (LDataSetProdutos.RecordCount = 0) then
+  begin
+    ShowMessage('A consulta de produtos está vazia ou inativa.');
+    Exit;
+  end;
+
+  var
+  ListaLinhas := TStringList.Create;
+  var
+  ListaDeInformacoesExtras := TStringList.Create;
+
+  try
+    LDataSetProdutos.First;
+    while not LDataSetProdutos.Eof do
+    begin
+      SQLNutricional.Close;
+      SQLNutricional.Params.ParamByName('CODPRODUTO').AsInteger := LDataSetProdutos.FieldByName('CODPRODUTO').AsInteger;
+      SQLNutricional.Open;
+
+      if not SQLNutricional.IsEmpty then
+      begin
+        var
+        IdNutricional := SQLNutricional.FieldByName('ID_PRODUTO_NUTRICIONAL').AsString;
+
+        if ListaDeInformacoesExtras.IndexOf(IdNutricional) = -1 then
+        begin
+          ListaDeInformacoesExtras.Add(IdNutricional);
+
+          var
+          linha := CriarLinhaInformacaoExtra(SQLNutricional);
+
+          if ListaLinhas.IndexOf(linha) = -1 then
+            ListaLinhas.Add(linha);
+        end;
+      end;
+
+      LDataSetProdutos.Next;
+    end;
+
+    if ListaLinhas.Count > 0 then
+      ListaLinhas.SaveToFile(ExtractFilePath(ACaminhoArquivo) + 'Txinfo.txt')
     else
       ShowMessage('Nenhuma informação nutricional encontrada para os produtos selecionados.');
   finally

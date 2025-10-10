@@ -2,6 +2,7 @@ object DataModule1: TDataModule1
   Height = 480
   Width = 640
   object SQLNutricional: TSQLQuery
+    Active = True
     MaxBlobSize = -1
     Params = <
       item

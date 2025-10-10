@@ -52,6 +52,7 @@ type
     cbxInfoNutri: TCheckBox;
     rdgNorma: TRadioGroup;
     rgNomeArquivo: TRadioGroup;
+    cbxInfoExtra: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure edtProd2Enter(Sender: TObject);
     procedure edtProd1Enter(Sender: TObject);
@@ -338,6 +339,10 @@ begin
 
     if cbxInfoNutri.Checked then
       UInformacoesNutricionais.DataModule1.GerarArquivoNutricional(dm.DtsProdutos, edtDiretorio.Text);
+
+    if cbxInfoExtra.Checked then
+      UInformacoesNutricionais.DataModule1.GerarArquivoInformacaoExtra(dm.DtsProdutos, edtDiretorio.Text);
+
   end
   else
     GerarTxtFilizola;
@@ -503,6 +508,7 @@ begin
     cbxInfoNutri.Checked := Ini.ReadBool('Configuracao', 'cbxInfoNutri', false);
     rgNomeArquivo.ItemIndex := Ini.ReadInteger('Configuracao', 'rgNomeArquivo', 0);
     rdgNorma.ItemIndex := Ini.ReadInteger('Configuracao', 'rdgNorma', 0);
+    cbxInfoExtra.Checked := Ini.ReadBool('Configuracao', 'cbxInfoExtra', false);
 
   finally
     Ini.Free;
@@ -814,7 +820,7 @@ begin
         DescricaoCompleta +
 
       // Código da Informação Extra do item  RRRRRR
-        ''.PadLeft(6, '0') +
+        dm.CDSProdutosID_PRODUTO_NUTRICIONA.AsString.PadLeft(6, '0') +
       // Código da Imagem do Item            FFFF
         ''.PadLeft(4, '0') +
       // Código da informação Nutricional    IIIIII
@@ -921,6 +927,7 @@ begin
     Ini.WriteInteger('Configuracao', 'rdgNorma', rdgNorma.ItemIndex);
     Ini.WriteInteger('Configuracao', 'rgNomeArquivo', rgNomeArquivo.ItemIndex);
     Ini.WriteBool('Configuracao', 'cbxInfoNutri', cbxInfoNutri.Checked);
+    Ini.WriteBool('Configuracao', 'cbxInfoExtra', cbxInfoExtra.Checked);
   finally
     Ini.Free;
   end;
