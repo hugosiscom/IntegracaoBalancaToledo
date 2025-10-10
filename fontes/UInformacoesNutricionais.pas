@@ -237,14 +237,25 @@ begin
     Exception.Create('Opção inválida para o radioGroup');
 end;
 
+function RemoverQuebrasDeLinha(const ATexto: string): string;
+begin
+  // Primeiro, substitui a combinação CR+LF (padrão Windows) por um espaço.
+  // Isso é feito primeiro para evitar a substituição por dois espaços.
+  Result := StringReplace(ATexto, #13#10, ' ', [rfReplaceAll]);
+
+  // Em seguida, substitui qualquer CR remanescente (padrão Mac antigo) por um espaço.
+  Result := StringReplace(Result, #13, ' ', [rfReplaceAll]);
+
+  // Finalmente, substitui qualquer LF remanescente (padrão Unix/Linux) por um espaço.
+  Result := StringReplace(Result, #10, ' ', [rfReplaceAll]);
+end;
+
 function CriarLinhaInformacaoExtra(AQuery: TSQLQuery): String;
 begin
   var
-    linhaExtra: String;
-
   linhaExtra := FormatarCampoNumerico(AQuery.FieldByName('ID_PRODUTO_NUTRICIONAL').AsString, 6) +
-    AQuery.FieldByName('OBS_INFO_EXTRA').AsString.PadRight(100, ' ') + AQuery.FieldByName('INFO_EXTRA')
-    .AsString.PadRight(1008, ' ');
+    AQuery.FieldByName('OBS_INFO_EXTRA').AsString.PadRight(100, ' ') +
+    RemoverQuebrasDeLinha(AQuery.FieldByName('INFO_EXTRA').AsString.PadRight(1008, ' '));
 
   Result := linhaExtra;
 end;
