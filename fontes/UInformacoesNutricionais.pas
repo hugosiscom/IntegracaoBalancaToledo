@@ -85,6 +85,9 @@ begin
 
   MedidaCaseira := AQuery.FieldByName('UNIDADE_CASEIRA').AsString;
 
+  if MedidaCaseira = '' then
+    MedidaCaseira := '05';
+
   var
   rbSelecionado := Frmprincipal.rdgNorma.ItemIndex;
 

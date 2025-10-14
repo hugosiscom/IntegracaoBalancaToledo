@@ -45,7 +45,25 @@ object DM: TDM
       'ErrorResourceFile='
       'LocaleCode=0000'
       'Interbase TransIsolation=ReadCommited'
-      'Trim Char=False')
+      'Trim Char=False'
+      
+        'ConnectionString=DriverUnit=Data.DBXFirebird,DriverPackageLoader' +
+        '=TDBXDynalinkDriverLoader,DbxCommonDriver250.bpl,DriverAssemblyL' +
+        'oader=Borland.Data.TDBXDynalinkDriverLoader,Borland.Data.DbxComm' +
+        'onDriver,Version=24.0.0.0,Culture=neutral,PublicKeyToken=91d62eb' +
+        'b5b0d1b1b,MetaDataPackageLoader=TDBXFirebirdMetaDataCommandFacto' +
+        'ry,DbxFirebirdDriver250.bpl,MetaDataAssemblyLoader=Borland.Data.' +
+        'TDBXFirebirdMetaDataCommandFactory,Borland.Data.DbxFirebirdDrive' +
+        'r,Version=24.0.0.0,Culture=neutral,PublicKeyToken=91d62ebb5b0d1b' +
+        '1b,GetDriverFunc=getSQLDriverINTERBASE,LibraryName=dbxfb.dll,Lib' +
+        'raryNameOsx=libsqlfb.dylib,VendorLib=fbclient.dll,VendorLibWin64' +
+        '=fbclient.dll,VendorLibOsx=/Library/Frameworks/Firebird.framewor' +
+        'k/Firebird,Role=RoleName,MaxBlobSize=-1,IsolationLevel=ReadCommi' +
+        'tted,TrimChar=False,DriverName=Firebird,Database=127.0.0.1/3050:' +
+        'C:\SISCOM\BD5\COMERCIAL.FDB,RoleName=RoleName,User_Name=SYSDBA,P' +
+        'assword=masterkey,ServerCharSet=WIN1252,SQLDialect=3,BlobSize=-1' +
+        ',CommitRetain=False,WaitOnLocks=True,ErrorResourceFile=,LocaleCo' +
+        'de=0000,Interbase TransIsolation=ReadCommited,Trim Char=False')
     Left = 48
     Top = 32
   end
