@@ -15,7 +15,7 @@ type
   public
     // Procedure principal que será chamada a partir do seu formulário ou de outra parte do sistema.
     // Parâmetros:
-    // - ASQLProdutos: A sua TSQLQuery que já contém os produtos selecionados.
+    // - ADtsProdutos: TDataSource que já contém os produtos selecionados.
     // - ACaminhoArquivo: O caminho (pasta) onde o arquivo 'Infnutri.txt' será salvo.
     procedure GerarArquivoNutricional(ADtsProdutos: TDataSource; const ACaminhoArquivo: string);
     procedure GerarArquivoInformacaoExtra(ADtsProdutos: TDataSource; const ACaminhoArquivo: string);

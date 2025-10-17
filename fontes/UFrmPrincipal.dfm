@@ -95,12 +95,20 @@ object Frmprincipal: TFrmprincipal
       OnClick = cbxInfoNutriClick
     end
     object cbxInfoExtra: TCheckBox
-      Left = 822
+      Left = 782
       Top = 22
       Width = 97
       Height = 17
       Caption = 'Inf. Extra'
       TabOrder = 3
+    end
+    object cbxTara: TCheckBox
+      Left = 863
+      Top = 22
+      Width = 66
+      Height = 17
+      Caption = 'Inf. Tara'
+      TabOrder = 4
     end
   end
   object DBGrid1: TDBGrid

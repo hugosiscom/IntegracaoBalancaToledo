@@ -53,6 +53,7 @@ type
     rdgNorma: TRadioGroup;
     rgNomeArquivo: TRadioGroup;
     cbxInfoExtra: TCheckBox;
+    cbxTara: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure edtProd2Enter(Sender: TObject);
     procedure edtProd1Enter(Sender: TObject);
@@ -109,7 +110,7 @@ var
 
 implementation
 
-uses Udm, UUtilidade, UInformacoesNutricionais;
+uses Udm, UUtilidade, UInformacoesNutricionais, UTara;
 
 {$R *.dfm}
 
@@ -343,6 +344,9 @@ begin
     if cbxInfoExtra.Checked then
       UInformacoesNutricionais.DataModule1.GerarArquivoInformacaoExtra(dm.DtsProdutos, edtDiretorio.Text);
 
+    if cbxTara.Checked then
+      UTara.DataModule2.GerarArquivoTara(dm.DtsProdutos, edtDiretorio.Text)
+
   end
   else
     GerarTxtFilizola;
@@ -509,6 +513,7 @@ begin
     rgNomeArquivo.ItemIndex := Ini.ReadInteger('Configuracao', 'rgNomeArquivo', 0);
     rdgNorma.ItemIndex := Ini.ReadInteger('Configuracao', 'rdgNorma', 0);
     cbxInfoExtra.Checked := Ini.ReadBool('Configuracao', 'cbxInfoExtra', false);
+    cbxTara.Checked := Ini.ReadBool('Configuracao', 'cbxTara', false);
 
   finally
     Ini.Free;
@@ -759,6 +764,10 @@ begin
 
   dpto := StrZero(StrToInt(edtDpto.Text), 2);
 
+  if DataModule2.SQLGroupTara.Active then
+    DataModule2.SQLGroupTara.Close;
+  DataModule2.SQLGroupTara.Open;
+
   while not dm.CDSProdutos.Eof do
   begin
     if rgCodigo.ItemIndex = 1 then
@@ -861,9 +870,19 @@ begin
         OutString := OutString + ''.PadLeft(4, '0'); }
 
       // Código do Som CS
-        ''.PadLeft(4, '0') +
+        ''.PadLeft(4, '0');
       // Código de Tara Pré-determinada CT
-        ''.PadLeft(4, '0') +
+
+      var
+      codTara := 0;
+
+      if (dm.CDSProdutosPESO_TARA.AsFloat > 0) and
+        (DataModule2.SQLGroupTara.Locate('PESO_TARA', dm.CDSProdutosPESO_TARA.AsFloat, [])) then
+      begin
+        codTara := DataModule2.SQLGroupTaraCODIGO_TARA.AsInteger;
+      end;
+
+      OutString := OutString + codTara.ToString.PadLeft(4, '0') + { ''.PadLeft(4, '0') }
       // Código do Fracionador            FR
         ''.PadLeft(4, '0') +
       // Código do Campo Extra 1            CE1
@@ -938,6 +957,7 @@ begin
     Ini.WriteInteger('Configuracao', 'rgNomeArquivo', rgNomeArquivo.ItemIndex);
     Ini.WriteBool('Configuracao', 'cbxInfoNutri', cbxInfoNutri.Checked);
     Ini.WriteBool('Configuracao', 'cbxInfoExtra', cbxInfoExtra.Checked);
+    Ini.WriteBool('Configuracao', 'cbxTara', cbxTara.Checked);
   finally
     Ini.Free;
   end;
